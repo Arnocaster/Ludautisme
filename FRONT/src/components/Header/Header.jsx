@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState,useEffect} from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Logo from '../public/logo.png';
@@ -10,6 +10,9 @@ import Cart from '../Cart/Cart';
 import Box from '@mui/material/Box';
 import {useNavigate} from "react-router-dom";
 import {Button} from '@mui/material'
+import Navbar from '../Navbar/navbar';
+import Menu from '@mui/material/Menu';
+
 
 
 
@@ -20,14 +23,30 @@ const Header = ({
     cartManager,
      ...rest}) => {
     const userToken = JSON.parse(localStorage.getItem('user'));
-    useEffect(() => {}, [userToken])
 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const isMobile = () => {
+        setMobile(window.matchMedia("(max-width: 820px)").matches);
+        console.log(mobile);
+    }
+    window.addEventListener('resize', isMobile);
+
+    const [mobile,setMobile] = useState(false);
 
     const navigate = useNavigate();
     const goTo = (event)=>{
         navigate(event.target.value);
     }
 
+    useEffect(() => {isMobile();}, [userToken])
     return (
        <header
             className={classnames('header', className)}
@@ -40,48 +59,32 @@ const Header = ({
 
 
 
-            <nav>
-                <label for="toggleheader">☰</label>
-                <input type="checkbox" id="toggleheader" />
-
-                <div className="main_pages">
+                {(mobile)?
+                <>
                 <Button
-                    value = '/'
-                    onClick = {goTo}
-                    className={({ isActive }) => isActive ? 'header-nav-link header-nav-link--active' : 'header-nav-link'}
+                    id="basic-button"
+                    aria-controls={open ? 'basic-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
                 >
-                    Accueil
+                    Dashboard
                 </Button>
-                <Button
-                    value = '/about'
-                    onClick = {goTo}
-                    className={({ isActive }) => isActive ? 'header-nav-link header-nav-link--active' : 'header-nav-link'}
+                <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                    }}
                 >
-                    Association
-                </Button>
-                <Button
-                    value = '/materiallibrary'
-                    onClick = {goTo}
-                    className={({ isActive }) => isActive ? 'header-nav-link header-nav-link--active' : 'header-nav-link'}
-                >
-                    Matériathèque
-                </Button>
-                <Button
-                    value = '/infos'
-                    onClick = {goTo}
-                    className={({ isActive }) => isActive ? 'header-nav-link header-nav-link--active' : 'header-nav-link'}
-                >
-                    Infos pratiques
-                </Button>
-                <Button
-                    value = '/usefullLinks'
-                    onClick = {goTo}
-                    className={({ isActive }) => isActive ? 'header-nav-link header-nav-link--active' : 'header-nav-link'}
-                >
-                    Liens utiles
-                </Button>
-                </div>
-            </nav>
+                    <Navbar handleClose={handleClose}/>
+                </Menu>
+                </>
+                :
+                <Navbar/>
+            }
                 <div class="header-items">
                     <Cart cartManager={cartManager} currentItems = {currentItems}/>
                     <LoginUser/>

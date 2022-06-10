@@ -48,7 +48,6 @@ const Cart = ({
 
     const getPersistentCart = async () => {
         await cartManager.init();
-        console.log("init",currentItems);
     }
     //Floating Cart
     const [scroll, setScroll] = useState(false);

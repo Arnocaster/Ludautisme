@@ -26,25 +26,6 @@ const CartModal = ({
      ...rest
     }) => {
     const [alertMessage, setAlertMessage] = useState();
-    //ACTUAL CART STATE
-
-    // const StyledBadge = styled(Badge)(({ theme }) => ({
-    //     '& .MuiBadge-badge': {
-    //       right: -3,
-    //       top: 13,
-    //       background:"#ee4842",
-    //       border: `2px solid #ffebcd`,
-    //       padding: '0 4px',
-    //     },
-    //   }));
-
-
-
-    //OPEN MODAL
-    // const [open, setOpen] = React.useState(false);
-    // const handleOpen = () => setOpen(true);
-    // const handleClose = () => {open = false};
-    console.log(currentItems);
     let [counter, setCounter] = useState(null);
 
     function handleRemoveItemClick  () {
@@ -74,12 +55,11 @@ const CartModal = ({
                 message : response.data.message}
                 );
                 setTimeout(()=>{handleClose();},1000);
-            console.log(`Une erreur est survenue`, response.data)
+            console.error(`CARTMODAL/AlertMessage : Une erreur est survenue`, response.data);
         };
     }
     //CALLBACK USED IN CURRENT REFERENCE TO GET ITEM AND DELETE HERE IN currentCart
     const removeItem = (itemId) =>{
-       console.log(cartManager,itemId);
        cartManager.remove(itemId);
     }
 
@@ -89,7 +69,6 @@ const CartModal = ({
 
 
     const countSentence = ()=>{
-        console.log(currentItems.length);
         if (currentItems === null){
             return `Votre panier est vide`
         }

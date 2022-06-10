@@ -16,7 +16,6 @@
     }
     &-content{
         position:relative;
-        width: 100%;
         display: flex;
         flex-flow: row wrap;
         align-items: center;
@@ -31,8 +30,7 @@
 
 nav
 {
-    margin: 0 auto;
-    width: 60%;
+
 }
 
 nav .main_pages
@@ -70,48 +68,55 @@ nav .main_pages Button
     display: none;
 }
 
+#basic-menu > .MuiMenu-paper {
+    padding: 10px;
+}
+
 @media all and (max-width: 1080px)
 {
-    .header{
-        height: 120px;
-        justify-content: space-between;
-    }
-    nav
+    // .header{
+    //     height: 120px;
+    //     justify-content: space-between;
+    // }
+    // nav
+    // {
+    //     margin:0;
+    //     height: 60px;
+    //     z-index:1;
+    //     width: 30%;
+    // }
+
+    nav .main_pages > button
     {
-        margin:0;
-        height: 60px;
-        z-index:1;
-        width: 30%;
+        font-size: 0.8rem;
     }
 
-    nav .main_pages
-    {
-        display: none;
-        align-items: flex-end;
+    // nav .main_pages a {
+    //     width: 30%;
+    // }
+
+    // label
+    // {
+    //     display: flex;
+    //     justify-content: center;
+    //     align-items: center;
+    //     margin: 0 auto;
+    //     font-size: 40px;
+    //     color: $font-color;
+    //     cursor: pointer;
+    //     order:-1;
+    // }
+
+    // #toggleheader:checked + .main_pages {
+    //     display: flex;
+    // }
+}
+@media all and (max-width: 820px){
+    nav .main_pages Button{
+        width: 100%;
+    }
+    .main_pages {
         flex-direction: column;
-        background: $font-color-2;
-        border-radius: 10px;
-        padding: 0 10px 0 10px;
-        float:right;
     }
 
-    nav .main_pages a {
-        width: 30%;
-    }
-
-    label
-    {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0 auto;
-        font-size: 40px;
-        color: $font-color;
-        cursor: pointer;
-        order:-1;
-    }
-
-    #toggleheader:checked + .main_pages {
-        display: flex;
-    }
 }
