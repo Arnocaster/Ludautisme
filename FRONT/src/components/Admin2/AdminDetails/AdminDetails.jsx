@@ -34,25 +34,40 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
 
     const handleSubmit = () => {
         const routeParam = (details.submitAction.params) && details.submitAction.params.param;
-        const minimalPayload = { body:updated };
-        const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;
+
+        //SPECIAL CASE USER ID_ROLE boolean handled with int true = 2 false = 1;
+        const updatedRoleBoolConv = (typeof(updated.id_role)==='boolean') ? (Number(updated.id_role) === 2) : null;  //Special case user roleHandle IntBoolean convertion
+        const minimalPayload = (updatedRoleBoolConv === null) ? { body:updated } : {body:updated,role:updatedRoleBoolConv};
+
+
+        console.log(minimalPayload);
+        const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;  //See apiSlice/index {body:{your data},opt. param:1 (param route)}
         ( isSubmitable && submit ) &&  submit( payload ).unwrap()
                                                         .then((payload) => {setAlert({severity:'success',message:'Succès'});
-                                                                            setTimeout(()=>{setAlert();setClose();},2500);
+                                                                            setTimeout(()=>{setAlert();
+                                                                                            //setClose();
+                                                                                            },2500);
                                                                             setContent( payload );
                                                                             
                                                                             })
                                                         .catch((error) => { console.error('rejected', error);
                                                                             setAlert( {severity:'error'
                                                                                        ,message:`${error.status}: ${error.data.message}`});
-                                                                            setTimeout(()=>{setAlert()},2500);
+                                                                            setTimeout(()=>{setAlert()},6000);
                                                                             });
     }
     const handleChange = (event) => {
         // console.log('pure target',event.target.name,event.target.value,event.target.checked);
-        const newValue = (event.target.value === '@!ludo_checkbox')                                                                 //Hack to identify checkbox cause value is in checked not in value
-                          ? event.target.checked 
-                          : event.target.value;
+        const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
+
+        const isIntCheckbox = (event.target.value === '@!ludo_checkbox_int')
+        const IntCheckboxValue = (event.target.checked === 2) ? true : false;
+
+        const checkBoxValue = (isIntCheckbox) ? IntCheckboxValue : isCheckboxValue;
+
+        const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
+                          ? event.target.value
+                          : checkBoxValue;
 
         setMode((mode !== 'new') ? 'edit' : mode);
 
@@ -61,7 +76,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
 
         //Check if all inputs are the same
         //!Strange comportment on users -> member number : return modified(true) after delete and rewrite same value
-        const checkModified = (details && details.mode !== 'new') ?                                                                                          //Avoid error if details empty
+        const checkModified = (details && details.mode !== 'new') ?                                                                 //Avoid error if details empty
                                         !Object.entries(details.content).every(                                                     //Compare every Api data fields and search for a difference
                                             (entrie)=> Object.keys(syncUpdated).includes(entrie[0])                                 //Defensive : check if all api props exist in current state 
                                                        && entrie[1] === syncUpdated[entrie[0]]                                      //and check if value is different
@@ -100,7 +115,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
 
     //Structure construction 
     const titleStruct = (schema) && Object.entries(schema)                                                                          // ['schema_prop = api data key',order_number]
-                                        .filter(prop => prop[1].title)                                                              //Keep only props who are use to set title
+                                        .filter(prop => prop[1].title)                                                              //Keep only props used to set title
                                         .sort((a,b)=>{return a[1].title - b[1].title})                                              //Sort by title order from small to big
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
@@ -133,8 +148,6 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
         // console.log(type,label,value,name);
         const types = {
             checkbox    : () => {
-                                const cleanedValue = true;
-                                const clv = Number();
                                 return (<FormControlLabel className='admin-details__input--checkbox admin-details__input '
                                                 name = {name}
                                                 key = {name}
@@ -142,7 +155,24 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                                                 //onChange = {(event)=>{console.log(event.target)}}
                                                 control={<Checkbox name = {name}
                                                                    value = '@!ludo_checkbox' 
-                                                                   checked={cleanedValue} 
+                                                                   checked={(value) && value}   //Always send something or mui throw error
+                                                                   onChange = {handleChange}
+                                                                   inputProps={{ 'aria-label': 'controlled' }}
+                                                                   />
+                                                        } 
+                                />)},
+            //Special User role case : true = 2 // false = 1 Why: today there are only two roles but db model handle 2+ case.
+            //Will Transform to a list when more than 2 case.
+            intCheckbox    : () => {
+                                const cleanedValue = (Number(value)===2)?true:false;            
+                                return (<FormControlLabel className='admin-details__input--checkbox admin-details__input '
+                                                name = {name}
+                                                key = {name}
+                                                label={(label) ? label : ''} 
+                                                //onChange = {(event)=>{console.log(event.target)}}
+                                                control={<Checkbox name = {name}
+                                                                   value = '@!ludo_checkbox_int' 
+                                                                   checked={(cleanedValue)&&(cleanedValue)} //Always send something or mui throw error
                                                                    onChange = {handleChange}
                                                                    inputProps={{ 'aria-label': 'controlled' }}
                                                                    />
@@ -182,6 +212,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
 
     return (
         <div className={`admin-details ${(details.open)?'admin-details__open':'admin-details__close'}`}>
+
             {/* HEADER */}
             <div className={`admin-details__header  ${(details.open)?'admin-details__header--open':'admin-details__header--close'}`}> 
                 <div  className='admin-details__header-button--close admin-details__header-button' onClick={setClose}>
@@ -190,6 +221,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                 <div className='admin-details__title'>{(titleOverride) ? titleOverride : dynaTitle}</div>
                 <Button disabled={(!isSubmitable)} onClick={handleSubmit} className='admin-details__header-button' variant="contained">Valider</Button>
             </div>
+
             {/* BLOCS */}
                 <div className={`admin-details__bloc-container ${(details.open)?'admin-details__bloc-container--open':'admin-details__bloc-container--close'}`} >
                     {blocNumb.map((bloc)=>{
@@ -199,19 +231,16 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                                 <div className='admin-details__bloc--title'> {bloc[1]}</div>
 
                                 <div className='admin-details__bloc--inputs'>
+
             {/* INPUTS */}
                                     {Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')
-                                            .sort((a,b)=>{ return a[1].field - b[1].field })                         //Sort inputs by field
-                                            .map((input)=>{
-                                                // console.log(input);
-                                                return inputType(input[1].inputDisplay,
-                                                                 input[1].label,
-                                                                 (!mode)?details.content[input[0]]:updated[input[0]],   //name
-                                                                 input[0]);
-                                                // <div className='admin-details__input--container'>
-                                                //     <label>{input[1].label}</label>
-                                                //     <input value={details.content[input[0]]} />
-                                                // </div>
+                                                            .sort((a,b)=>{ return a[1].field - b[1].field })                         //Sort inputs by field
+                                                            .map((input)=>{
+                                                                // console.log(input);
+                                    return inputType(input[1].inputDisplay,
+                                                    input[1].label,
+                                                    (!mode)?details.content[input[0]]:updated[input[0]],   //name
+                                                    input[0]);
                                             }
 
                                     )}

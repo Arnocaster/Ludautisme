@@ -155,7 +155,7 @@ const userSchema  = {
         label : "Role",
         gridDisplay : "normal",
         width : 75,
-        inputDisplay : 'checkbox',
+        inputDisplay : 'intCheckbox',
         bloc : 2,
         field : 6
     },

@@ -18,17 +18,4 @@ export default createSlice({
     setOpen : (state,action) => {
         state.open = true;
     },
-    setClose : (state,action) => {
-        state.open = false;
-    },
-    setSubmitPayload:(state,action)  => {
-      state.submitAction = action.payload; // mutate the state all you want with immer
-    },
-    setReducer:(state,action) => {
-        state.reducer = action.payload.charAt(0).toUpperCase() + action.payload.slice(1); //Capitalise for redux apiSlice automatic function naming 
-    },
-    setMode:(state,action) => {
-        state.mode = action.payload;
-    }
-  },
-})
+  

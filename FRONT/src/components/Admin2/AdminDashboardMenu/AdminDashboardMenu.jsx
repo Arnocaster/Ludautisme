@@ -6,7 +6,7 @@ import './admindashboardmenu.scss';
 import CircularProgress from '@mui/material/CircularProgress';
 import {Button} from '@mui/material';
 
-const AdminDashboardMenu = ({title, buttons, searchbar}) => {
+const AdminDashboardMenu = ({title, buttons}) => {
     const { details, users } = useSelector(state => state); //Redux state 
 
     const handleNewElement = (params) => {

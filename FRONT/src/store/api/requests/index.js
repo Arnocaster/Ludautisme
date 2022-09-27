@@ -1,11 +1,12 @@
 /* eslint-disable array-callback-return */
 //Ici aggrégation des différents enpoints des fichiers requests
 import { adminUsers } from "./adminUsers";
+import { adminReferences } from "./adminReferences";
 
 export const initEndpoints = (builder) =>{
 
     //REFERENCEMENT DE NOUVELLES LIBRAIRIES API
-    const endpointsLibs = [adminUsers];
+    const endpointsLibs = [adminUsers,adminReferences];
     
     //On lit chaque librairie de requete, si stucture ok on le rajoute au endpoints
     //Chaque hook de requete doit être unique
@@ -65,7 +66,6 @@ export const initEndpoints = (builder) =>{
            
             // if (   typeof endpointLib[endpointName] === 'function'  //Si ok on les ajoute a endpoints
             //     && typeof endpointLib[endpointName]() === 'string'){
-                console.log(buildRequest(endpointLib[endpointName]));
                 endpoints = {...endpoints, ...{[endpointName] : buildRequest(endpointLib[endpointName])} };
             // }
             //Sinon on retourne une erreur

@@ -11,10 +11,13 @@ import { useGetUsersQuery, apiSlice } from '../../../store/api/apiSlice.js';
 import {useSelector} from 'react-redux';
 const AdminUsers2 = () => {
     const getUsers = useGetUsersQuery(); //Mandatory on top-level for useEffect usage
-    const { details, users } = useSelector(state => state); //Redux state
+    const getReferences = apiSlice.useGetReferencesQuery();
+    const { details, users, references } = useSelector(state => state); //Redux state
 
     store.dispatch(actions.users.handleFetch(getUsers)); //First loading only, fetch an store api
-
+    store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
+    // console.log(references,actions.references.handleFetch());
+    console.log();
 
     const buttons = [
         [{label : 'ajouter',
@@ -40,7 +43,7 @@ const AdminUsers2 = () => {
     
     return (
         <div className = 'adminUser'>
-            <AdminDashboardMenu title='Adhérents' store={store.getState().users} buttons={buttons}/>
+            <AdminDashboardMenu title='Adhérents' buttons={buttons}/>
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid

@@ -7,6 +7,7 @@ import HomePage from '../Front-Office/Static/HomePage/HomePage';
 import Admin from '../Admin/Admin';
 import AdminHome2 from '../Admin2/AdminHome/AdminHome'
 import AdminUsers2 from '../Admin2/AdminUsers/AdminUsers'
+import AdminReferences2 from '../Admin2/AdminReferences/AdminReferences'
 import AdminPage from '../Admin/AdminPage/AdminPage';
 import AdminHome from '../Admin/AdminHome/AdminHome';
 import AdminUsers from '../Admin/AdminUsers/AdminUsers';
@@ -77,6 +78,7 @@ function App() {
             {/*ADMIN REFACTOR*/}
             <Route path = "/admin2/home" element = {<AdminHome2 />}></Route>
             <Route exact path = "/admin2/users/"  element={(<AdminHome2 content={<AdminUsers2 />} />)}/>
+            <Route exact path = "/admin2/references/"  element={(<AdminHome2 content={<AdminReferences2 />} />)}/>
             {/* <Route path = "/admin/references/:id" element = {<AdminReference />}></Route> */}
             {/* <Route path = "/admin/references/:id/articles" element = {<AdminArticles />}></Route> */}
             {/* <Route path = "/admin/categories" element = {<AdminCategories />}></Route> */}
