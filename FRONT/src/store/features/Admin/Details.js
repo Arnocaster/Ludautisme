@@ -18,4 +18,4 @@ export default createSlice({
     setOpen : (state,action) => {
         state.open = true;
     },
-  
+    setClose : (state,ac
