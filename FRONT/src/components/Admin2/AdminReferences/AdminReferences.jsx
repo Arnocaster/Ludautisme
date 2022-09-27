@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './adminreferences.scss';
+import './adminreference.scss';
 import AdminDashboardMenu from '../AdminDashboardMenu/AdminDashboardMenu';
 import AdminDataGrid from '../AdminDatagrid/AdminDatagrid';
 import AdminDetails from '../AdminDetails/AdminDetails';
@@ -15,8 +15,6 @@ const AdminReferences2 = () => {
     const { details, references } = useSelector(state => state); //Redux state
 
     store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
-    // console.log(references,actions.references.handleFetch());
-    console.log();
 
     const buttons = [
         [{label : 'ajouter',
@@ -49,7 +47,7 @@ const AdminReferences2 = () => {
                         rows={references.references}
                         schema={referenceSchema}
                         reducer='references'
-                        submitAction = 'useUpdateReferencesMutation'
+                        submitAction = 'useUpdateReferenceMutation'
                         />
                 </div>
                         {(Object.keys(details.content).length > 0 || details.mode === 'new')  &&

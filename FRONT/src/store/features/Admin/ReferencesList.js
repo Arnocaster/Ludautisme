@@ -19,7 +19,7 @@ export default createSlice({
         state.status = action.payload.status;
         state.references = (action.payload.data)   //!MODIF
                             ? action.payload.data 
-                            : state.users;
+                            : state.references;
     },
     // updateReference:(state,action) => {
     //     console.log('state',state.users,'action',action);

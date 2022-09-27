@@ -22,6 +22,7 @@ const AdminDatagrid = ({
     schema,
     submitAction,
     reducer,
+    defaultSortBy,
 }) => {
 
     // RESPONSIVE DATAGRID HEIGHT
@@ -34,6 +35,7 @@ const AdminDatagrid = ({
     const debouncedHandleResize = debounce(() => {
         const delta = (window.innerHeight < clientHeight ) ?  clientHeight - window.innerHeight : 0;
         setClientHeight(window.innerHeight);
+        console.log(parentSize.current.getBoundingClientRect().height,parentSize)
         setHeight(parentSize.current.getBoundingClientRect().height - delta);
     }, 16);
 
@@ -49,6 +51,12 @@ const AdminDatagrid = ({
 
     const [columns] = useState(['id']);  //Allow datagrid render even without values
 
+    const buildInitialState = () =>{
+        const sort = (defaultSortBy) && {sorting : {sortModel : [defaultSortBy],}};                 // defaultSortBy need to be like { field: 'rating', sort: 'desc' } doc here : https://mui.com/x/react-data-grid/sorting/
+        const params = [sort];                                                                      // Stack params here
+        const buildedInitState = params.reduce((prev,curr)=> (curr) && {...prev,...curr} ,{});      // If current param exist add it to initialState
+        return buildedInitState;
+    }
 
     //Configure custom render cell
     const customCellBuilder = {
@@ -114,6 +122,8 @@ const AdminDatagrid = ({
                 <DataGrid
                     rows={rows}
                     columns={(schema)? columnBuilder() : columns}
+                    // initialState={(initialState)?initialState:{}}
+                    initialState={buildInitialState()}
                     GridColDef="center"
                     localeText={frFR.components.MuiDataGrid.defaultProps.localeText}
                     components={{

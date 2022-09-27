@@ -1,5 +1,5 @@
 const ApiError = require('../../errors/apiError');
-const { referenceDataMapper, pictureDataMapper } = require('../../models/admin');
+const { referenceDataMapper, pictureDataMapper, categoryDataMapper } = require('../../models/admin');
 
 module.exports = {
     async getAll(req, res) {
@@ -47,7 +47,13 @@ module.exports = {
         if (reference.length < 1) {
             throw new ApiError(404, 'Cet utilisateur n\'existe pas');
         }
-        const updateRef = await referenceDataMapper.update(req.params.id, req.body);
+
+        const cleanedRef = req.body;
+        delete cleanedRef.id_maincat; // Id maincat does not belong to reference
+        delete cleanedRef.name_maincat; // Name maincat does not belong to reference
+        delete cleanedRef.tag;
+
+        const updateRef = await referenceDataMapper.update(req.params.id, cleanedRef);
         return res.json(updateRef);
     },
 };

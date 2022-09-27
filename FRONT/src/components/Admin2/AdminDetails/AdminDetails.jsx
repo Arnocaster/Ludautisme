@@ -31,6 +31,10 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
     // eslint-disable-next-line no-unused-vars
     const [submit,res] = apiSlice[details.submitAction.actionName]();
 
+    useEffect(()=>{
+        setClose();
+    },[schema]);
+
 
     const handleSubmit = () => {
         const routeParam = (details.submitAction.params) && details.submitAction.params.param;
@@ -57,14 +61,16 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                                                                             });
     }
     const handleChange = (event) => {
-        // console.log('pure target',event.target.name,event.target.value,event.target.checked);
+        
+        //Handling regular checkbok event
         const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
-
+        //Handling int checkbok event 1 = false 2 = true currently only for user role (27/09/2022)
         const isIntCheckbox = (event.target.value === '@!ludo_checkbox_int')
-        const IntCheckboxValue = (event.target.checked === 2) ? true : false;
-
+        const IntCheckboxValue = (event.target.checked === true) ? 2 : 1;
+        
         const checkBoxValue = (isIntCheckbox) ? IntCheckboxValue : isCheckboxValue;
 
+        //Set new value
         const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
                           ? event.target.value
                           : checkBoxValue;

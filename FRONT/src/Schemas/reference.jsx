@@ -3,13 +3,16 @@ const referenceSchema  = {
         type: "number",
         label: "Modifier référence",
         gridDisplay: "edit",
-        width: 200
+        width: 200,
+        inputDisplay:"none"
     },
     name:{
         type : "string",
         label : "Nom",
         gridDisplay : "normal",
         width : 250,
+        bloc : 1,
+        blocTitle : 'Identification'
     },
     description:{
         type : "string",
@@ -22,18 +25,22 @@ const referenceSchema  = {
         label : "Valorisation",
         gridDisplay : "normal",
         width : 150,
+        bloc : 1,
     },
     id_maincat:{
         type : "number",
         label : "Id Catégorie",
         gridDisplay : "normal",
         width : 150,
+        bloc : 2,
+        blockTitle : 'Classification'
     },
     name_maincat:{
         type : "string",
         label : "Nom Catégorie",
         gridDisplay : "normal",
         width : 150,
+        bloc : 2
     },
     /*tag:{
         type : "string",
