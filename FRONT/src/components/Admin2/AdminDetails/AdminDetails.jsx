@@ -13,15 +13,26 @@ import frLocale from 'date-fns/locale/fr';
 import { format } from 'date-fns';
 //import Checkbox from '@mui/material/Checkbox';
 
-const AdminDetails = ({schema,titleOverride,modeOverride}) => {
+const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
     const { details } = useSelector(state => state);
     const setClose = ()=> store.dispatch(actions.details.setClose());
     const setContent = (data)=> store.dispatch(actions.details.setContent(data));
     apiSlice[`useGet${details.reducer}Query`]();                  //! Ask to Fetch data need to go in useState?
 
     const [mode,setMode] = useState((modeOverride) ? modeOverride : null);
+
+    //Use only schema prop to update api (ex. : user doesn't update password)
+    const updatedStuct = () => {
+        const props = Object.keys (schema);
+        const struct = props.reduce((prev,curr)=>{
+            const filledProp = (details) ? details.content[curr] : null;
+            return {...prev,...{[curr]:filledProp}}
+        }
+        ,{});
+        return struct;
+    }
     
-    const [updated,setUpdated] = useState((details) ? {...details.content} : null);
+    const [updated,setUpdated] = useState(updatedStuct());
 
     const [alert, setAlert] = useState(null);
     const [errors,setErrors] = useState(false);
@@ -31,9 +42,10 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
     // eslint-disable-next-line no-unused-vars
     const [submit,res] = apiSlice[details.submitAction.actionName]();
 
-    useEffect(()=>{
-        setClose();
-    },[schema]);
+    //Close details on schema change
+    // useEffect(()=>{
+    //     setClose();
+    // },[schema]);
 
 
     const handleSubmit = () => {
@@ -78,6 +90,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
         setMode((mode !== 'new') ? 'edit' : mode);
 
         //Get update and insert current changement.
+        console.log(updated);
         const syncUpdated = {...updated,[event.target.name]:newValue};
 
         //Check if all inputs are the same
@@ -104,14 +117,13 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
         const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                                   //Check if there is no error
         
         setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));             //Go back from Entries (array) to object
-        console.log(checkModified);
         setIsSubmitable((checkModified && checkConform));                                                                                   //Set is conform (= conform to submit)
         setUpdated({...syncUpdated});
     }
 
     useEffect(()=>{(details) && setUpdated(details.content); 
                     setIsSubmitable(false);
-                    setUpdated((details) ? {...details.content} : null);
+                    setUpdated(updatedStuct());
                   },[details]);
 
     //DYNAMIC TITLE (Default)
@@ -209,6 +221,9 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                                             id="outlined-size-normal"
                                             onChange = {handleChange} 
                                             value={(value) ? value : '' } />),
+            datagrid : () =>{//AdminDatagrid render or DefailsDatagrid?);
+                                console.log('Datagrid render test');
+            },
         }
 
         return (types[type]) ? types[type](label,value) : types.input(label,value)
@@ -239,15 +254,15 @@ const AdminDetails = ({schema,titleOverride,modeOverride}) => {
                                 <div className='admin-details__bloc--inputs'>
 
             {/* INPUTS */}
-                                    {Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')
-                                                            .sort((a,b)=>{ return a[1].field - b[1].field })                         //Sort inputs by field
+                                    {Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')     //
+                                                            .sort((a,b)=>{ return a[1].field - b[1].field })                                     //Sort inputs by field
                                                             .map((input)=>{
                                                                 // console.log(input);
-                                    return inputType(input[1].inputDisplay,
-                                                    input[1].label,
-                                                    (!mode)?details.content[input[0]]:updated[input[0]],   //name
-                                                    input[0]);
-                                            }
+                                                                return inputType(input[1].inputDisplay,
+                                                                                 input[1].label,
+                                                                                 (!mode) ? details.content[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
+                                                                                input[0]);
+                                                                }
 
                                     )}
                                 </div>
