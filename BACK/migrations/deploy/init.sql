@@ -37,8 +37,13 @@ CREATE TABLE "permanency" (
 CREATE TABLE "category" (
     "id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "name" TEXT NOT NULL UNIQUE,
-    "description" TEXT,
-    "main" BOOLEAN DEFAULT false
+    "description" TEXT
+);
+
+CREATE TABLE "tag" (
+    "id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "name" TEXT NOT NULL UNIQUE,
+    "description" TEXT
 );
 
 CREATE TABLE "reference" (
@@ -67,6 +72,12 @@ CREATE TABLE "reference_to_category" (
     "id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "id_ref" INT REFERENCES "reference"("id"),
     "id_category" INT REFERENCES "category"("id")
+);
+
+CREATE TABLE "reference_to_tag" (
+    "id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "id_ref" INT REFERENCES "reference"("id"),
+    "id_tag" INT REFERENCES "category"("id")
 );
 
 CREATE TABLE "article" (

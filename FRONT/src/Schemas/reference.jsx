@@ -12,13 +12,16 @@ const referenceSchema  = {
         gridDisplay : "normal",
         width : 250,
         bloc : 1,
-        blocTitle : 'Identification'
+        blocTitle : 'Identification',
+        title : 1,
     },
     description:{
         type : "string",
         label : "Description",
         gridDisplay : "normal",
         width : 400,
+        inputDisplay : 'textArea',
+        bloc : 3,
     },
     valorisation:{
         type : "number",
@@ -27,27 +30,27 @@ const referenceSchema  = {
         width : 150,
         bloc : 1,
     },
-    id_maincat:{
+    main_category:{
         type : "number",
         label : "Id Catégorie",
         gridDisplay : "normal",
         width : 150,
-        bloc : 2,
-        blockTitle : 'Classification'
+        inputDisplay :  'select',
+        apiCall :       'Categories',
+        blocTitle :     'Classification',
+        bloc :              2,
+
+        
     },
-    name_maincat:{
-        type : "string",
-        label : "Nom Catégorie",
-        gridDisplay : "normal",
-        width : 150,
-        bloc : 2
-    },
-    /*tag:{
-        type : "string",
+    tag:{
+        type : "number",
         label : "tag",
-        gridDisplay : "normal",
+        gridDisplay : "array",
         width : 250,
-    }*/
+        apiCall : 'tag',
+        inputDisplay : 'chipContainer',
+        bloc : 2
+    }
 }
 
 export {referenceSchema}

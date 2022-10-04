@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import './materiallibrarymenu.scss';
 import api from '../../../../requests';
-import { Button, Slide, Box, Paper, Chip, Menu, Modal, Dialog } from '@mui/material';
+import { Button, Slide, Box, Paper, Chip, Modal } from '@mui/material';
 import InputAutocomplete from '../MaterialLibraryComponents/InputAutocomplete/InputAutocomplete'
 import MaterialLibraryMenuFilter from '../MaterialLibraryFilter/MaterialLibraryMenuFilter';
 import CloseIcon from '@mui/icons-material/Close';
@@ -88,56 +88,58 @@ const MaterialLibraryMenu = ({
             className={'materiallibrarymenu-inputs-modal'}
             onClose={handleCloseMenu} open={open}>
                 <Box className='materiallibrarymenu-inputs-modal__content'>
-                <p><strong>Filtres</strong></p>
-                <div className='materiallibrarymenu-filters-container'>
-                    <div className='materiallibrarymenu-filters-container-list'>
-                                {(categoriesList) &&
-                                    categoriesList.map(cat=>(
-                                        (getFilterState.categories.includes(cat.id))&&
-                                            (<Chip key={`cat-${cat.id}`}
-                                                    data-remove={`categories-${cat.id}`} 
-                                                    label={cat.name} 
-                                                    variant="outlined" 
-                                                    onDelete={handleRemove}/>)
-                                    ))
-                                }
-                                {(tagsList) &&
-                                    tagsList.map(tag=>(
-                                        (getFilterState.tags.includes(tag.id))&&
-                                            (<Chip key={`tag-${tag.id}`} 
-                                                    data-remove={`tags-${tag.id}`} 
-                                                    label={tag.name} 
-                                                    variant="outlined" 
-                                                    onDelete={handleRemove}/>)
-                                    ))
-                                }
+                    <p><strong>Filtres</strong></p>
+                    <div className='materiallibrarymenu-filters-container'>
+                        <div className='materiallibrarymenu-filters-container-list'>
+                                    {(categoriesList) &&
+                                        categoriesList.map(cat=>(
+                                            (getFilterState.categories.includes(cat.id))&&
+                                                (<Chip key={`cat-${cat.id}`}
+                                                        data-remove={`categories-${cat.id}`} 
+                                                        label={cat.name} 
+                                                        variant="outlined" 
+                                                        onDelete={handleRemove}/>)
+                                        ))
+                                    }
+                                    {(tagsList) &&
+                                        tagsList.map(tag=>(
+                                            (getFilterState.tags.includes(tag.id))&&
+                                                (<Chip key={`tag-${tag.id}`} 
+                                                        data-remove={`tags-${tag.id}`} 
+                                                        label={tag.name} 
+                                                        variant="outlined" 
+                                                        onDelete={handleRemove}/>)
+                                        ))
+                                    }
 
+                        </div>
+                        <Button className={(!getFilterState.categories
+                                        && !getFilterState.tags
+                                        && !getFilterState.available
+                                        )
+                                        ?'hidden'
+                                        :''
+                                        } onClick={updateFilterState.reset}>Reset</Button>
                     </div>
-                    <Button className={(!getFilterState.categories
-                                    && !getFilterState.tags
-                                    && !getFilterState.available
-                                    )
-                                    ?'hidden'
-                                    :''
-                                    } onClick={updateFilterState.reset}>Reset</Button>
-                </div>
-                <MaterialLibraryMenuFilter
-                className={`is--menu`}
-                ref={filtersRef}
-                updateFilterState={updateFilterState}
-                getFilterState={getFilterState}
-                removeFilterState={removeFilterState}
-                categoriesList={categoriesList}
-                tagsList={tagsList}
-                nameList={nameList}
-                isDesktop = {isDesktop}
-                typeDisplay = {typeDisplay}
-                //handleCloseMenu = {handleCloseMenu}
-                />
-                <Box sx={{display:'flex',alignItems:'center',alignContent:'center',borderRadius:'2rem',border:'1px solid black',padding:'5px 10px'}} onClick={handleCloseMenu}>
-                    <p>Fermer</p>
-                    <CloseIcon/>
-                </Box>
+                    <MaterialLibraryMenuFilter
+                        className={`is--menu`}
+                        ref={filtersRef}
+                        updateFilterState={updateFilterState}
+                        getFilterState={getFilterState}
+                        removeFilterState={removeFilterState}
+                        categoriesList={categoriesList}
+                        tagsList={tagsList}
+                        nameList={nameList}
+                        isDesktop = {isDesktop}
+                        typeDisplay = {typeDisplay}
+                        //handleCloseMenu = {handleCloseMenu}
+                    />
+                    <Box sx={{display:'flex',alignItems:'center',alignContent:'center',borderRadius:'2rem',border:'1px solid black',padding:'5px 10px'}} 
+                        onClick={handleCloseMenu}
+                    >
+                        <p>Fermer</p>
+                        <CloseIcon/>
+                    </Box>
                 </Box>
             </Modal>
              <Button

@@ -23,18 +23,18 @@ module.exports = {
         SELECT
         r.id,
         r.name,
-        r.description,
+        --r.description,
         r.valorisation,
-        cat.id AS id_maincat,
-        cat.name AS name_maincat,
+        cat.id AS main_category,
+        cat.name AS name_category,
         json_agg(DISTINCT jsonb_build_object(
-            'id',"category"."id",
-            'name',"category"."name"
+            'id',"tag"."id",
+            'name',"tag"."name"
             )) AS tag
         FROM "reference" AS r
         LEFT JOIN "category" AS cat ON r."main_category" = cat."id"
-        LEFT JOIN "reference_to_category" AS rtc ON rtc."id_ref" = r."id"
-        LEFT JOIN "category" ON rtc."id_category" = "category"."id"
+        LEFT JOIN "reference_to_tag" AS rtt ON rtt."id_ref" = r."id"
+        LEFT JOIN "tag" ON rtt."id_tag" = tag."id"
         LEFT JOIN "article" ON "article"."id_ref" = r."id"
         GROUP BY r.name, r.description, r.valorisation, r.id, cat.name,cat.id
         `);
@@ -70,8 +70,8 @@ module.exports = {
             r.name,
             r.description,
             r.valorisation,
-            cat.id AS id_maincat,
-            cat.name AS name_maincat,
+            cat.id AS main_category,
+            cat.name AS category_name,
             json_agg(DISTINCT jsonb_build_object(
                 'id',"category"."id",
                 'name',"category"."name"
@@ -116,8 +116,8 @@ module.exports = {
             r.name,
             r.description,
             r.valorisation,
-            cat.id AS id_maincat,
-            cat.name AS name_maincat,
+            cat.id AS main_category,
+            cat.name AS category_name,
             json_agg(DISTINCT jsonb_build_object(
                 'id',"category"."id",
                 'name',"category"."name"
@@ -143,7 +143,7 @@ module.exports = {
             LEFT JOIN "image" ON rti."id_image" = "image"."id"
             LEFT JOIN "category" AS cat ON r."main_category" = cat."id"
             LEFT JOIN "reference_to_category" AS rtc ON rtc."id_ref" = r."id"
-            LEFT JOIN "category" ON rtc."id_category" = "category"."id"
+            LEFT JOIN "tag" t ON t."id_category" = "category"."id"
             LEFT JOIN "article" AS ar ON ar."id_ref" = r."id"
             WHERE r.id IN (`;
             const placeholders = [];

@@ -1553,8 +1553,8 @@ INSERT INTO "reference_to_category" ("id_ref", "id_category") VALUES
     (1550,7),
     (1551,6),
     (1552,6),
-    (1553,9),
-    (1554,10),
+    (1553,8), --Corretion to 8 initital : Category 9 
+    (1554,8), --Corretion to 8 initital : Category 10
     (1555,5),
     (1556,7),
     (1557,2),

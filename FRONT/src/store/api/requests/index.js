@@ -2,11 +2,12 @@
 //Ici aggrégation des différents enpoints des fichiers requests
 import { adminUsers } from "./adminUsers";
 import { adminReferences } from "./adminReferences";
+import { adminCategories } from "./adminCategories";
 
 export const initEndpoints = (builder) =>{
 
     //REFERENCEMENT DE NOUVELLES LIBRAIRIES API
-    const endpointsLibs = [adminUsers,adminReferences];
+    const endpointsLibs = [adminUsers,adminReferences,adminCategories];
     
     //On lit chaque librairie de requete, si stucture ok on le rajoute au endpoints
     //Chaque hook de requete doit être unique

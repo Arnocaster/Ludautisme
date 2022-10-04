@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 import {actions} from '../../../store/reducers';
 import { apiSlice } from '../../../store/api/apiSlice.js';
 import CloseIcon from '@mui/icons-material/Close';
-import {FormControlLabel,Checkbox,TextField,Button,Snackbar,Alert } from '@mui/material/';
+import {FormControlLabel,Checkbox,TextField,Button,Snackbar,Alert,Select,MenuItem,Chip } from '@mui/material/';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -19,6 +19,14 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
     const setContent = (data)=> store.dispatch(actions.details.setContent(data));
     apiSlice[`useGet${details.reducer}Query`]();                  //! Ask to Fetch data need to go in useState?
 
+
+    const apiFetch = (reducer) => {
+        const capitalized = reducer[0].toUpperCase() + reducer.slice(1).toLowerCase();
+        const lowered = reducer.toLowerCase();
+        const res = apiSlice[`useGet${capitalized}Query`]();
+        store.dispatch(actions[lowered].handleFetch(res));
+    }
+
     const [mode,setMode] = useState((modeOverride) ? modeOverride : null);
 
     //Use only schema prop to update api (ex. : user doesn't update password)
@@ -26,7 +34,8 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
         const props = Object.keys (schema);
         const struct = props.reduce((prev,curr)=>{
             const filledProp = (details) ? details.content[curr] : null;
-            return {...prev,...{[curr]:filledProp}}
+            const propIsDisplayed = (filledProp && schema[curr].inputDisplay !== 'none') && filledProp;
+            return (propIsDisplayed) ? {...prev,...{[curr]:propIsDisplayed}} : prev;
         }
         ,{});
         return struct;
@@ -56,7 +65,7 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
         const minimalPayload = (updatedRoleBoolConv === null) ? { body:updated } : {body:updated,role:updatedRoleBoolConv};
 
 
-        console.log(minimalPayload);
+        console.log('minimalPayload',minimalPayload);
         const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;  //See apiSlice/index {body:{your data},opt. param:1 (param route)}
         ( isSubmitable && submit ) &&  submit( payload ).unwrap()
                                                         .then((payload) => {setAlert({severity:'success',message:'Succès'});
@@ -73,7 +82,6 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                                                             });
     }
     const handleChange = (event) => {
-        
         //Handling regular checkbok event
         const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
         //Handling int checkbok event 1 = false 2 = true currently only for user role (27/09/2022)
@@ -86,7 +94,6 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
         const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
                           ? event.target.value
                           : checkBoxValue;
-
         setMode((mode !== 'new') ? 'edit' : mode);
 
         //Get update and insert current changement.
@@ -114,10 +121,10 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                                                             : 'Saisie Incorrecte'
                                                 ,error[2]]);     
 
-        const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                                   //Check if there is no error
+        const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                        //Check if there is no error
         
-        setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));             //Go back from Entries (array) to object
-        setIsSubmitable((checkModified && checkConform));                                                                                   //Set is conform (= conform to submit)
+        setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));      //Go back from Entries (array) to object
+        setIsSubmitable((checkModified && checkConform));                                                                             //Set is conform (= conform to submit)
         setUpdated({...syncUpdated});
     }
 
@@ -162,9 +169,28 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
     //console.log(blocNumb);
     
     //DYNAMIC INPUT
-    const inputType = (type,label,value,name) => {
-        // console.log(type,label,value,name);
+    const inputType = (type,label,value,name,apiCall) => {
+        (type === 'chipContainer') && console.log(type,label,value,name);
         const types = {
+            select : () => {
+                const lowered = apiCall.toLowerCase();
+                apiFetch(apiCall);
+                const list = store.getState()[lowered][lowered];
+                const resValue = (updated[name])?updated[name]:details.content[name]
+                return(
+                     <Select
+                        name = {name}
+                        key = {name}
+                        labelId={name}
+                        id="demo-simple-select"
+                        value={(resValue)?resValue:''}
+                        label={name}
+                        onChange={handleChange}
+                    >
+                        {(list)&& list.map(elt=><MenuItem key={`${name}-item-${elt.id}`}value={elt.id}>{elt.name}</MenuItem>)}
+                    </Select>
+                )
+            },
             checkbox    : () => {
                                 return (<FormControlLabel className='admin-details__input--checkbox admin-details__input '
                                                 name = {name}
@@ -207,11 +233,19 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                             label={(label) ? label : ''}
                                             value={value}
                                             onChange = {(event) => (event) && (event.toString() !== 'Invalid Date' && event) ? handleChange({target:{name,value:format(event, 'yyyy-MM-dd')}}) : console.log(event)} 
-                                            // onChange = {(event) => (event) && (event.toString() !== 'Invalid Date' && event) ? console.log(true,typeof(event)) : console.log(false,event)} 
-                                            //onChange={(event) => handleChangeDate(event)}
                                             renderInput={(params) => <TextField {...params} />}
                                         />
                                     </LocalizationProvider>)},
+            textArea    : () => (<TextField className='admin-details__input'
+                                            error={(errors) && !(!errors[name])}
+                                            helperText={(errors && errors[name]) ? errors[name] : '' }
+                                            name = {name}
+                                            key = {name}
+                                            label={(label) ? label : ''} 
+                                            id="outlined-size-normal"
+                                            onChange = {handleChange} 
+                                            value={(value) ? value : '' } 
+                                            multiline/>),
             input       : () => (<TextField className='admin-details__input'
                                             error={(errors) && !(!errors[name])}
                                             helperText={(errors && errors[name]) ? errors[name] : '' }
@@ -221,6 +255,12 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                             id="outlined-size-normal"
                                             onChange = {handleChange} 
                                             value={(value) ? value : '' } />),
+            chipContainer : () => {//AdminImageGallery render );
+                                console.log('ChipContainer render test');
+            },
+            imageGallery : () => {//AdminImageGallery render );
+                                console.log('ImageGallery render test');
+            },
             datagrid : () =>{//AdminDatagrid render or DefailsDatagrid?);
                                 console.log('Datagrid render test');
             },
@@ -261,7 +301,9 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                                                 return inputType(input[1].inputDisplay,
                                                                                  input[1].label,
                                                                                  (!mode) ? details.content[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
-                                                                                input[0]);
+                                                                                input[0],
+                                                                                input[1].apiCall,
+                                                                                input[1].linkedField);
                                                                 }
 
                                     )}

@@ -48,12 +48,7 @@ module.exports = {
             throw new ApiError(404, 'Cet utilisateur n\'existe pas');
         }
 
-        const cleanedRef = req.body;
-        delete cleanedRef.id_maincat; // Id maincat does not belong to reference
-        delete cleanedRef.name_maincat; // Name maincat does not belong to reference
-        delete cleanedRef.tag;
-
-        const updateRef = await referenceDataMapper.update(req.params.id, cleanedRef);
+        const updateRef = await referenceDataMapper.update(req.params.id, req.body);
         return res.json(updateRef);
     },
 };

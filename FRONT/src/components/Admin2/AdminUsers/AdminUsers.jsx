@@ -7,11 +7,11 @@ import { userSchema } from '../../../Schemas';
 // import users from '../../../store/features/Admin/UsersList';
 import store from '../../../store';
 import {actions} from '../../../store/reducers';
-import { useGetUsersQuery, apiSlice } from '../../../store/api/apiSlice.js';
+import { useGetUsersQuery} from '../../../store/api/apiSlice.js';
 import {useSelector} from 'react-redux';
 const AdminUsers2 = () => {
     const getUsers = useGetUsersQuery(); //Mandatory on top-level for useEffect usage
-    const { details, users, references } = useSelector(state => state); //Redux state
+    const { details, users} = useSelector(state => state); //Redux state
 
     store.dispatch(actions.users.handleFetch(getUsers));
 
@@ -52,8 +52,11 @@ const AdminUsers2 = () => {
                         defaultSortBy = {{ field: 'member_number', sort: 'asc' }}
                         />
                 </div>
-                        {(Object.keys(details.content).length > 0 || details.mode === 'new')&&<AdminDetails schema={userSchema} 
-                                    titleOverride={(details.mode === 'new')?'Nouvel utilisateur':null}
+                        {(Object.keys(details.content).length > 0 || details.mode === 'new')
+                            &&<AdminDetails 
+                                schema={userSchema} 
+                                titleOverride={(details.mode === 'new')?'Nouvel utilisateur':null
+                            }
                         />}
             </div>
         </div>

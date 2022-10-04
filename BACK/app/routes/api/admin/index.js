@@ -7,10 +7,12 @@ const bookingRouter = require('./booking');
 const permanencyRouter = require('./permanency');
 const articleRouter = require('./article');
 const categorieRouter = require('./category');
+const tagRouter = require('./tag');
 const { ApiError } = require('../../../errors/apiError');
 
 const router = express.Router();
 
+router.use('/tag', tagRouter);
 router.use('/categorie', categorieRouter);
 router.use('/picture', pictureRouter);
 router.use('/users', userRouter);

@@ -5,6 +5,7 @@ const pictureDataMapper = require('./picture');
 const referenceDataMapper = require('./reference');
 const usersDataMapper = require('./users');
 const categoryDataMapper = require('./category');
+const tagDataMapper = require('./tag');
 
 module.exports = {
     articleDataMapper,
@@ -14,4 +15,5 @@ module.exports = {
     referenceDataMapper,
     usersDataMapper,
     categoryDataMapper,
+    tagDataMapper,
 };

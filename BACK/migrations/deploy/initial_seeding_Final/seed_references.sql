@@ -1553,8 +1553,8 @@ INSERT INTO "reference" ("name", "description", "valorisation", "main_category")
     ('Au pays des petits dragons','1 règle du jeu, 1 dé spécial, 60 pierres volcaniques, 4 figurines dragons et 1 plateau en 3 morceaux, et 4 flèches sens du vent.',10,7),
     ('Mémo des bébés animaux','1 règle du jeu et 54 grands jetons.',10,6),
     ('Couleurs et formes','1 règle du jeu, 4 planches recto-verso, 24 jetons illustrés et 24 jetons couleurs.',10,6),
-    ('Mallette "école" Lud''autisme','Mallette à roulettes Lud''autisme: 22 éléments à l''intèrieur.Contenu: 2 baguettes kaléidoscope, lot de 7 balles à paillettes, 1 Levita ball (1 pipe, 10 pailles, 2 pilles polystirène), 1 casque anti-bruit, 1 tour de cou lesté, 1 balle anti-stress,',428.08,9),
-    ('Mallette "de base" Lud''autisme','Lot contenant 12 élémentsContenu: 1 lot intégral de pictogrammes (Jeu intégral IDEO), 1 casque anti-bruit, 1 Time Timer 20cm magnétique, 1 œuf masseur, 1 balançoire cocon southpaw et son support Hoptoys, 1 siège balançoire adapté max 45kg,',1748.55,10),
+    ('Mallette "école" Lud''autisme','Mallette à roulettes Lud''autisme: 22 éléments à l''intèrieur.Contenu: 2 baguettes kaléidoscope, lot de 7 balles à paillettes, 1 Levita ball (1 pipe, 10 pailles, 2 pilles polystirène), 1 casque anti-bruit, 1 tour de cou lesté, 1 balle anti-stress,',428.08,8), --Switch ref to 8 Initial 9
+    ('Mallette "de base" Lud''autisme','Lot contenant 12 élémentsContenu: 1 lot intégral de pictogrammes (Jeu intégral IDEO), 1 casque anti-bruit, 1 Time Timer 20cm magnétique, 1 œuf masseur, 1 balançoire cocon southpaw et son support Hoptoys, 1 siège balançoire adapté max 45kg,',1748.55,8), --Switch ref to 8 Initial 9
     ('Hochet à grelots',NULL,5,5),
     ('Faqir','1 plateau, 28 cônes, 24 cartes, 4 paravents, 1 sac.Jeu donné en mars 2020, complet!',15,7),
     ('La guerre des clans CD','1 CD sur le retour à l''état sauvage lu par Erwann Zamor',5,2),
