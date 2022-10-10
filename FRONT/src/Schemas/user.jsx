@@ -5,13 +5,16 @@ Full object example
         type: "number",
         label: "Editer profil",
         gridDisplay: "edit",
+        gridArrayProp : 'name',            //For gridDisplay = array, object prop used to display data
         width: 100,
         titlePrefix : '#',                  //Add a prefix in title only
         title : 3,                          //Display order in title only,   if missing => Not in
-        inputDisplay : 'none' | 'input' | 'checkbox' | 'date' 
+        inputDisplay : 'none' | 'input' | 'checkbox' | 'intCheckbox' | 'date' | 'chipList' | 'imageGallery' | 'datagrid'
         bloc  : 1,                          //Bloc affectation,              if missing  => In the 'default' bloc at bottom of the page
         blocTitle : 'Identité',             //BlocTitle, need to be on first field of each block,id no order field, takes the first found if missing => no block title
         field : 1,                          //Field order,                   if missing  => at the end bloc end by prop order in this schema
+        apiCall : 'tag',                    //For inputs who needs to load all entity data to display (Select,ChipList)
+        apiCallProp : 'tag',                //For inputs who needs to load all entity data to display (Select,ChipList) if none use schema prop 
     },
 
 

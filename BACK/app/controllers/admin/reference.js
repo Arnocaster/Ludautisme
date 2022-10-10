@@ -45,10 +45,30 @@ module.exports = {
         const reference = await referenceDataMapper.findOne(req.params.id);
 
         if (reference.length < 1) {
-            throw new ApiError(404, 'Cet utilisateur n\'existe pas');
+            throw new ApiError(404, 'Cette référence n\'existe pas');
         }
 
-        const updateRef = await referenceDataMapper.update(req.params.id, req.body);
-        return res.json(updateRef);
+        const newRef = req.body;
+
+        // Get and update update referencetotag
+        const oldTagsIds = (Array.isArray(reference.tag))
+                                && reference.tag.map((tagObj) => tagObj.id);
+        const newTagsIds = (Array.isArray(newRef.tag))
+                                && newRef.tag.map((tagObj) => tagObj.id);
+
+        // Get new and removed tags.
+        const addedTags = (newTagsIds && oldTagsIds)
+            && newTagsIds.filter((id) => !oldTagsIds.includes(id));
+        const removedTags = (newTagsIds && oldTagsIds)
+            && oldTagsIds.filter((id) => !newTagsIds.includes(id));
+
+        console.log('!!!LES TAGS', addedTags, removedTags);
+
+        // Remove tags  (doesn't belong to reference entity)
+        delete newRef.tag;
+
+        const updateRef = await referenceDataMapper.update(req.params.id, newRef);
+        const updatedRef = await referenceDataMapper.findOne(req.params.id);
+        return res.json(updatedRef[0]);
     },
 };

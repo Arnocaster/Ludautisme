@@ -169,8 +169,8 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
     //console.log(blocNumb);
     
     //DYNAMIC INPUT
-    const inputType = (type,label,value,name,apiCall) => {
-        (type === 'chipContainer') && console.log(type,label,value,name);
+    const inputType = (type,label,value,name,apiCall,inputArrayProp) => {
+        (type === 'chipList') && console.log(type,label,value,name);  //Debug only
         const types = {
             select : () => {
                 const lowered = apiCall.toLowerCase();
@@ -255,8 +255,23 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                             id="outlined-size-normal"
                                             onChange = {handleChange} 
                                             value={(value) ? value : '' } />),
-            chipContainer : () => {//AdminImageGallery render );
-                                console.log('ChipContainer render test');
+            chipList    : () => {//AdminImageGallery render );
+                                console.log('ChipContainer render test',value);
+                                const handleRemove = (e) => {
+                                    const dataAttr = e.currentTarget.closest('div').dataset.remove.split("-");
+                                    const type = dataAttr[0];
+                                    const dataId = dataAttr[1];
+                                    console.log(dataAttr);
+                                    //removeFilterState[type](dataId); 
+                                }
+                                return (value) && value.map((val,index) => (
+                                                <Chip   key={`${name}-${index}`} 
+                                                        data-remove={`${name}-${index}`}
+                                                        label={val[inputArrayProp]}
+                                                        variant="outlined" 
+                                                        onDelete={handleRemove}
+                                                />)
+                                );
             },
             imageGallery : () => {//AdminImageGallery render );
                                 console.log('ImageGallery render test');
@@ -303,7 +318,8 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                                                                  (!mode) ? details.content[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
                                                                                 input[0],
                                                                                 input[1].apiCall,
-                                                                                input[1].linkedField);
+                                                                                input[1].inputArrayProp,
+                                                                                );
                                                                 }
 
                                     )}

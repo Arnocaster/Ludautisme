@@ -3,11 +3,12 @@
 import { adminUsers } from "./adminUsers";
 import { adminReferences } from "./adminReferences";
 import { adminCategories } from "./adminCategories";
+import { adminTags } from "./adminTags";
 
 export const initEndpoints = (builder) =>{
 
     //REFERENCEMENT DE NOUVELLES LIBRAIRIES API
-    const endpointsLibs = [adminUsers,adminReferences,adminCategories];
+    const endpointsLibs = [adminUsers,adminReferences,adminCategories,adminTags];
     
     //On lit chaque librairie de requete, si stucture ok on le rajoute au endpoints
     //Chaque hook de requete doit être unique

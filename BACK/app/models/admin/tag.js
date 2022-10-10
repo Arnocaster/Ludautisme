@@ -77,4 +77,22 @@ module.exports = {
         const result = await sqlHandler(query, placeholders);
         return result.rows[0];
     },
+    async getTagToReference(idRef, idTag) {
+        const query = `SELECT * FROM "reference_to_tag" WHERE id_ref = $1 AND id_tag = $2`;
+        const placeholders = [idRef, idTag];
+        const result = await sqlHandler(query, placeholders);
+        return result.rows;
+    },
+    async addTagToReference(idRef, idTag) {
+        const query = `INSERT INTO "reference_to_tag" (id_ref,id_tag) VALUES ($1,$2)`;
+        const placeholders = [idRef, idTag];
+        const result = await sqlHandler(query, placeholders);
+        return result.rows[0];
+    },
+    async removeTagFromReference(idRef, idTag) {
+        const query = `DELETE FROM "reference_to_tag" WHERE id_ref = $1 AND id_tag = $2`;
+        const placeholders = [idRef, idTag];
+        const result = await sqlHandler(query, placeholders);
+        return result.rows[0];
+    },
 };

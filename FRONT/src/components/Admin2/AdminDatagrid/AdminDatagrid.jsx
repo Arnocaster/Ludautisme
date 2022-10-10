@@ -93,6 +93,11 @@ const AdminDatagrid = ({
                 <EditIcon />
             </IconButton>
                     ),
+        array   : (params) => {
+            const valueProp = (schema[params.field].gridArrayProp) && schema[params.field].gridArrayProp;
+            const array = (valueProp && params.value[0][valueProp]) && params.value.map((value) => `${value[valueProp]} `);
+            return (array) ? array : '';
+        }
     }
 
 

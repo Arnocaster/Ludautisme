@@ -49,13 +49,13 @@ module.exports = {
         r.valorisation,
         cat.name AS mainCategory,
          json_agg(DISTINCT jsonb_build_object(
-                    'id',"category"."id",
-                    'name',"category"."name"
+                    'id',"tag"."id",
+                    'name',"tag"."name"
                     )) AS tag
         FROM "reference" AS r
-        LEFT JOIN "category" AS cat ON r."main_category" = cat."id"
-        LEFT JOIN "reference_to_category" AS rtc ON rtc."id_ref" = r."id"
-        LEFT JOIN "category" ON rtc."id_category" = "category"."id"
+        LEFT JOIN "category" cat ON r.main_category = cat.id
+        LEFT JOIN "reference_to_tag" AS rtt ON rtt."id_ref" = r."id"
+        LEFT JOIN "tag" ON rtt."id_tag" = tag."id"
         LEFT JOIN "article" ON "article"."id_ref" = r."id"
         WHERE "article"."available" = true AND "article"."archived" = false
         GROUP BY r.name, r.description, r.valorisation, r.id, cat.name
@@ -73,8 +73,8 @@ module.exports = {
             cat.id AS main_category,
             cat.name AS category_name,
             json_agg(DISTINCT jsonb_build_object(
-                'id',"category"."id",
-                'name',"category"."name"
+                'id',"tag"."id",
+                'name',"tag"."name"
                 )) AS tag,
             json_agg(DISTINCT jsonb_build_object (
                 'id', "image"."id",
@@ -95,9 +95,9 @@ module.exports = {
             FROM "reference" AS r
             LEFT JOIN "reference_to_image" AS rti ON r."id" = rti."id_ref"
             LEFT JOIN "image" ON rti."id_image" = "image"."id"
-            LEFT JOIN "category" AS cat ON r."main_category" = cat."id"
-            LEFT JOIN "reference_to_category" AS rtc ON rtc."id_ref" = r."id"
-            LEFT JOIN "category" ON rtc."id_category" = "category"."id"
+            LEFT JOIN "category" cat ON r.main_category = cat.id
+            LEFT JOIN "reference_to_tag" AS rtt ON rtt."id_ref" = r."id"
+            LEFT JOIN "tag" ON rtt."id_tag" = tag."id"
             LEFT JOIN "article" AS ar ON ar."id_ref" = r."id"
             WHERE r.id = $1
             GROUP BY r.name, r.description, r.valorisation, r.id, cat.name, cat.id`,
@@ -119,8 +119,8 @@ module.exports = {
             cat.id AS main_category,
             cat.name AS category_name,
             json_agg(DISTINCT jsonb_build_object(
-                'id',"category"."id",
-                'name',"category"."name"
+                'id',"tag"."id",
+                'name',"tag"."name"
                 )) AS tag,
             json_agg(DISTINCT jsonb_build_object (
                 'id', "image"."id",
@@ -141,9 +141,9 @@ module.exports = {
             FROM "reference" AS r
             LEFT JOIN "reference_to_image" AS rti ON r."id" = rti."id_ref"
             LEFT JOIN "image" ON rti."id_image" = "image"."id"
-            LEFT JOIN "category" AS cat ON r."main_category" = cat."id"
-            LEFT JOIN "reference_to_category" AS rtc ON rtc."id_ref" = r."id"
-            LEFT JOIN "tag" t ON t."id_category" = "category"."id"
+            LEFT JOIN "category" cat ON r.main_category = cat.id
+            LEFT JOIN "reference_to_tag" AS rtt ON rtt."id_ref" = r."id"
+            LEFT JOIN "tag" ON rtt."id_tag" = tag."id"
             LEFT JOIN "article" AS ar ON ar."id_ref" = r."id"
             WHERE r.id IN (`;
             const placeholders = [];

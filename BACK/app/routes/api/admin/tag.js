@@ -14,6 +14,11 @@ const router = express.Router();
  */
 router.route('/search')
     .post(controllerHandler(tagController.findFiltered));
+
+router.route('/tagtoreference/:idRef')
+    .post(controllerHandler(tagController.addTagToReference))
+    .delete(controllerHandler(tagController.removeTagToReference));
+
 /**
  * PUT api/admin/categorie/:id
  * @summary Update one Tag

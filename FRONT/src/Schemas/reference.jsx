@@ -38,17 +38,17 @@ const referenceSchema  = {
         inputDisplay :  'select',
         apiCall :       'Categories',
         blocTitle :     'Classification',
-        bloc :              2,
-
-        
+        bloc :              2,     
     },
     tag:{
         type : "number",
         label : "tag",
         gridDisplay : "array",
+        gridArrayProp : 'name',
         width : 250,
         apiCall : 'tag',
-        inputDisplay : 'chipContainer',
+        inputArrayProp : 'name',
+        inputDisplay : 'chipList',
         bloc : 2
     }
 }
