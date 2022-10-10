@@ -1,5 +1,5 @@
 const ApiError = require('../../errors/apiError');
-const { referenceDataMapper, pictureDataMapper, categoryDataMapper } = require('../../models/admin');
+const { referenceDataMapper, pictureDataMapper, tagDataMapper } = require('../../models/admin');
 
 module.exports = {
     async getAll(req, res) {
@@ -51,20 +51,33 @@ module.exports = {
         const newRef = req.body;
 
         // Get and update update referencetotag
-        const oldTagsIds = (Array.isArray(reference.tag))
-                                && reference.tag.map((tagObj) => tagObj.id);
+        const oldTagsIds = (Array.isArray(reference[0].tag))
+                                && reference[0].tag.map((tagObj) => tagObj.id);
         const newTagsIds = (Array.isArray(newRef.tag))
                                 && newRef.tag.map((tagObj) => tagObj.id);
 
         // Get new and removed tags.
         const addedTags = (newTagsIds && oldTagsIds)
             && newTagsIds.filter((id) => !oldTagsIds.includes(id));
+
+        if (addedTags.length) {
+            await addedTags.forEach(
+                (tagId) => tagDataMapper.addTagToReference(reference[0].id, tagId),
+            );
+        }
+
         const removedTags = (newTagsIds && oldTagsIds)
             && oldTagsIds.filter((id) => !newTagsIds.includes(id));
 
-        console.log('!!!LES TAGS', addedTags, removedTags);
+        if (removedTags.length) {
+            await removedTags.forEach(
+                (tagId) => tagDataMapper.removeTagFromReference(reference[0].id, tagId),
+            );
+        }
 
-        // Remove tags  (doesn't belong to reference entity)
+        console.log('!!!MODIF LES TAGS', addedTags, removedTags);
+
+        // Remove tags before update reference entity  (doesn't belong to reference entity)
         delete newRef.tag;
 
         const updateRef = await referenceDataMapper.update(req.params.id, newRef);

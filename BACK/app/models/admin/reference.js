@@ -23,7 +23,7 @@ module.exports = {
         SELECT
         r.id,
         r.name,
-        --r.description,
+        r.description,
         r.valorisation,
         cat.id AS main_category,
         cat.name AS name_category,

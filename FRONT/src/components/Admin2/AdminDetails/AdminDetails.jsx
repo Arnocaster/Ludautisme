@@ -5,19 +5,21 @@ import {useSelector} from 'react-redux';
 import {actions} from '../../../store/reducers';
 import { apiSlice } from '../../../store/api/apiSlice.js';
 import CloseIcon from '@mui/icons-material/Close';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {FormControlLabel,Checkbox,TextField,Button,Snackbar,Alert,Select,MenuItem,Chip } from '@mui/material/';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import frLocale from 'date-fns/locale/fr';
 import { format } from 'date-fns';
+import AdminDetailsChipContainer from './AdminDetailsComponents/AdminDetailsChipContainer/AdminDetailsChipContainer';
 //import Checkbox from '@mui/material/Checkbox';
 
-const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
+const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids}) => {
     const { details } = useSelector(state => state);
     const setClose = ()=> store.dispatch(actions.details.setClose());
     const setContent = (data)=> store.dispatch(actions.details.setContent(data));
-    apiSlice[`useGet${details.reducer}Query`]();                  //! Ask to Fetch data need to go in useState?
+    apiSlice[`useGet${details.reducer}Query`]();                 //! Ask to Fetch data need to go in useState?
 
 
     const apiFetch = (reducer) => {
@@ -97,8 +99,9 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
         setMode((mode !== 'new') ? 'edit' : mode);
 
         //Get update and insert current changement.
-        console.log(updated);
+        //console.log('updated',updated,'event',event,'shallow',{[event.target.name]:newValue});
         const syncUpdated = {...updated,[event.target.name]:newValue};
+        console.log('sync',syncUpdated);
 
         //Check if all inputs are the same
         //!Strange comportment on users -> member number : return modified(true) after delete and rewrite same value
@@ -169,25 +172,28 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
     //console.log(blocNumb);
     
     //DYNAMIC INPUT
-    const inputType = (type,label,value,name,apiCall,inputArrayProp) => {
-        (type === 'chipList') && console.log(type,label,value,name);  //Debug only
+    const inputType = (type,label,value,name,apiList,apiListValueProp,apiListLabelProp) => {
+        //(type === 'chipList') && console.log(type,label,value,name);  //Debug only
         const types = {
             select : () => {
-                const lowered = apiCall.toLowerCase();
-                apiFetch(apiCall);
+                const lowered = apiList.toLowerCase();
+                apiFetch(apiList);
                 const list = store.getState()[lowered][lowered];
-                const resValue = (updated[name])?updated[name]:details.content[name]
+                const resValue = (updated[name])?updated[name]:details.content[name];
                 return(
                      <Select
                         name = {name}
                         key = {name}
                         labelId={name}
                         id="demo-simple-select"
-                        value={(resValue)?resValue:''}
+                        value={(resValue && list.length) ? resValue : '' }
                         label={name}
                         onChange={handleChange}
                     >
-                        {(list)&& list.map(elt=><MenuItem key={`${name}-item-${elt.id}`}value={elt.id}>{elt.name}</MenuItem>)}
+                        {(list) && list.map(elt=><MenuItem key={`${name}-item-${elt.id}`}
+                                                          value={elt.id}>{elt.name}
+                                                </MenuItem>
+                                            )}
                     </Select>
                 )
             },
@@ -255,24 +261,19 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                             id="outlined-size-normal"
                                             onChange = {handleChange} 
                                             value={(value) ? value : '' } />),
-            chipList    : () => {//AdminImageGallery render );
-                                console.log('ChipContainer render test',value);
-                                const handleRemove = (e) => {
-                                    const dataAttr = e.currentTarget.closest('div').dataset.remove.split("-");
-                                    const type = dataAttr[0];
-                                    const dataId = dataAttr[1];
-                                    console.log(dataAttr);
-                                    //removeFilterState[type](dataId); 
-                                }
-                                return (value) && value.map((val,index) => (
-                                                <Chip   key={`${name}-${index}`} 
-                                                        data-remove={`${name}-${index}`}
-                                                        label={val[inputArrayProp]}
-                                                        variant="outlined" 
-                                                        onDelete={handleRemove}
-                                                />)
-                                );
-            },
+            chipList    : () => (
+                <AdminDetailsChipContainer
+                    key={name}
+                    reducer                 = {reducer}
+                    reducerValue            = {value}
+                    reducerProp             = {name}
+                    reducerList             = {apiList}
+                    reducerListValueProp    = {apiListValueProp}
+                    reducerListLabelProp    = {apiListLabelProp}
+
+                />
+                               
+            ),
             imageGallery : () => {//AdminImageGallery render );
                                 console.log('ImageGallery render test');
             },
@@ -317,8 +318,9 @@ const AdminDetails = ({schema,titleOverride,modeOverride,detailsDatagrids}) => {
                                                                                  input[1].label,
                                                                                  (!mode) ? details.content[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
                                                                                 input[0],
-                                                                                input[1].apiCall,
-                                                                                input[1].inputArrayProp,
+                                                                                input[1].apiList,
+                                                                                input[1].apiListValueProp,
+                                                                                input[1].apiListLabelProp
                                                                                 );
                                                                 }
 

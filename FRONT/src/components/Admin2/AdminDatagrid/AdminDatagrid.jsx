@@ -35,7 +35,7 @@ const AdminDatagrid = ({
     const debouncedHandleResize = debounce(() => {
         const delta = (window.innerHeight < clientHeight ) ?  clientHeight - window.innerHeight : 0;
         setClientHeight(window.innerHeight);
-        console.log(parentSize.current.getBoundingClientRect().height,parentSize)
+        //console.log(parentSize.current.getBoundingClientRect().height,parentSize)
         setHeight(parentSize.current.getBoundingClientRect().height - delta);
     }, 16);
 

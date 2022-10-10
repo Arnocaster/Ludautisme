@@ -51,7 +51,8 @@ const AdminReferences2 = () => {
                         />
                 </div>
                         {(Object.keys(details.content).length > 0 || details.mode === 'new')  &&
-                                <AdminDetails schema={referenceSchema} 
+                                <AdminDetails   schema={referenceSchema}
+                                                reducer='references'
                                               titleOverride={(details.mode === 'new')
                                                                 ?'Nouvel utilisateur'
                                                                 :null}

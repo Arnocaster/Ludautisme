@@ -70,7 +70,7 @@
             color: red;
         }
     }
-    .admin-details__bloc-container {
+    &__bloc-container {
         overflow: auto;
         height: 100%;
         padding: 1rem 2.5rem;
@@ -83,7 +83,7 @@
         }
     }
 
-    .admin-details__bloc {
+    &__bloc {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -102,7 +102,7 @@
         }
     }
 
-    .admin-details__input{
+    &__input{
         margin: 0.5rem 1rem;
         flex-grow: 1;
         &:hover {

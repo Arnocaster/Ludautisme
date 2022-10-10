@@ -36,7 +36,7 @@ const referenceSchema  = {
         gridDisplay : "normal",
         width : 150,
         inputDisplay :  'select',
-        apiCall :       'Categories',
+        apiList :       'Categories',
         blocTitle :     'Classification',
         bloc :              2,     
     },
@@ -46,8 +46,9 @@ const referenceSchema  = {
         gridDisplay : "array",
         gridArrayProp : 'name',
         width : 250,
-        apiCall : 'tag',
-        inputArrayProp : 'name',
+        apiList : 'tags',
+        apiListValueProp : 'id',
+        apiListLabelProp : 'name',
         inputDisplay : 'chipList',
         bloc : 2
     }

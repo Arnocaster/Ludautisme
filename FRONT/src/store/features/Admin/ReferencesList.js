@@ -9,9 +9,6 @@ export default createSlice({
   name: 'references',    //!MODIF
   initialState,
   reducers: {
-    setUserName: (state, action) => {
-      state.name = action.payload // mutate the state all you want with immer
-    },
     setStatus: (state, action) => {
       state.status = action.payload // mutate the state all you want with immer
     },
@@ -21,10 +18,19 @@ export default createSlice({
                             ? action.payload.data 
                             : state.references;
     },
-    // updateReference:(state,action) => {
-    //     console.log('state',state.users,'action',action);
-    //     //const user = state.user.find((user)=>user.id === action.payload.id);
-    //     //console.log(user);
-    // }
+    update:(state,action) => {
+        console.log('state',state.users,'action',action);
+        //const user = state.user.find((user)=>user.id === action.payload.id);
+        //console.log(user);
+    },
+    removeOne:(state,action) => {
+        console.log('state',state.users,'action',action);
+        const entries = Object.entries(action.payload);
+        const prop = entries[0];
+        const value = entries[1];
+        const removedArr = state.users[prop].filter((val)=> val !== value);
+        console.log(removedArr);
+        //console.log(user);
+    }
   },
 })
