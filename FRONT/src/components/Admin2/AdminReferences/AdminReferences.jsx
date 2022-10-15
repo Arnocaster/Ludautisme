@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import './adminreference.scss';
 import AdminDashboardMenu from '../AdminDashboardMenu/AdminDashboardMenu';
 import AdminDataGrid from '../AdminDatagrid/AdminDatagrid';
@@ -16,11 +16,11 @@ const AdminReferences2 = () => {
 
     //store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
     //console.log(getReferences);
-    const buttons = [
+    const [buttons,setButtons] = useState([
         [{label : 'ajouter',
           action : {reducer:'references',mode:'new',submitAction:'useAddReferenceMutation'}
         }]
-    ]
+    ]);
 
 
     // //Refrech on each render
@@ -40,13 +40,12 @@ const AdminReferences2 = () => {
     
     return (
         <div className = 'adminReferences'>
-            <AdminDashboardMenu title='Références' buttons={buttons}/>
+            <AdminDashboardMenu title='Références' buttons={[...buttons]}/>
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
                         schema={referenceSchema}
                         reducer='references'
-                        submitAction = 'useUpdateReferenceMutation'
                         />
                 </div>
                     <AdminDetails   schema={referenceSchema}

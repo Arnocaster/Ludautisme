@@ -5,7 +5,7 @@ const referenceSchema  = {
         gridDisplay: "edit",
         width: 200,
         inputDisplay:"none",
-        mainProp : true,
+        primaryKey : true,
     },
     name:{
         type : "string",
@@ -37,7 +37,9 @@ const referenceSchema  = {
         gridDisplay : "normal",
         width : 150,
         inputDisplay :  'select',
-        apiList :       'Categories',
+        apiList :       'categories',
+        apiListValueProp : 'id',
+        apiListLabelProp : 'name',
         blocTitle :     'Classification',
         bloc :              2,     
     },
@@ -47,11 +49,23 @@ const referenceSchema  = {
         gridDisplay : "array",
         gridArrayProp : 'name',
         width : 250,
+        inputDisplay : 'chipList',
         apiList : 'tags',
         apiListValueProp : 'id',
         apiListLabelProp : 'name',
-        inputDisplay : 'chipList',
         bloc : 2
+    },
+    reference:{
+        type : "number",
+        label : "tag",
+        gridDisplay : "none",
+        //gridArrayProp : 'name',
+        width : 250,
+        inputDisplay : 'datagrid',
+        apiList : 'references',
+        apiListValueProp : 'id',
+        apiListLabelProp : 'name',
+        bloc : 4
     }
 }
 

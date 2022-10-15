@@ -1,9 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-     content:{}
-    ,open:false
-    ,submitAction : {actionName:'null',params:{param:null,body:null}}
+    open:false
     ,reducer : null
     ,mode : null
 }

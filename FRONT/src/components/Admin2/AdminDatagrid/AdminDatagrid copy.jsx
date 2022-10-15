@@ -42,14 +42,14 @@ const AdminDatagrid = ({
         setHeight(parentSize.current.getBoundingClientRect().height - delta);
     }, 16);
 
-    useEffect(() => {
-        debouncedHandleResize();
-        window.addEventListener('resize', debouncedHandleResize);
-        return (_) => {
-            window.removeEventListener('resize', debouncedHandleResize);
-        };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clientHeight]);
+    // useEffect(() => {
+    //     debouncedHandleResize();
+    //     window.addEventListener('resize', debouncedHandleResize);
+    //     return (_) => {
+    //         window.removeEventListener('resize', debouncedHandleResize);
+    //     };
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [clientHeight]);
     // END RESPONSIVE DATAGRID HEIGHT
 
     //MAIN LOGIC
@@ -58,20 +58,12 @@ const AdminDatagrid = ({
     //FetchData
     const apiSliceQuery = `useGet${capitalize(reducer)}Query`;
     const apiQuery = apiSlice[apiSliceQuery](); //Mandatory on top-level for useEffect usage
-    //console.log(apiQuery);
     //Put data in local reducer
-    //store.dispatch(actions[reducer].handleFetch(apiQuery));
+    store.dispatch(actions[reducer].handleFetch(apiQuery));
 
-    const [rows,setRows] = useState([]);
-
-    useEffect(()=>{console.log(apiQuery)
-                    const {status} = apiQuery;
-                    console.log(status);
-                    (status === 'fulfilled') &&  store.dispatch(actions[reducer].handleFetch(apiQuery));
-                     (status === 'fulfilled') && setRows(apiQuery.data);              
-    },[apiQuery,reducer]);
+    const [rows,setRows] = useState(getState.allItems);
     
-    // useEffect(()=>{(getState.allItems.length > 0) && setRows(getState.allItems)},[getState.allItems]);
+    useEffect(()=>{(getState.allItems.length > 0) && setRows(getState.allItems)},[getState.allItems]);
     
     const [columns] = useState(['id']);  //Allow datagrid render even without values
 
@@ -107,7 +99,7 @@ const AdminDatagrid = ({
                 aria-label={`testEdit-${params.row.id}`}
                  onClick={()=>{
                                 const reducerState = {...store.getState()[reducer]}; //{active:{},content:{},status:''};
-                                const foundMainProp = [...Object.entries(schema).find((ent)=> ent[1].primaryKey)];
+                                const foundMainProp = [...Object.entries(schema).find((ent)=> ent[1].mainProp)];
                                 if (foundMainProp.length > 0 ) {
                                     const mainProp = foundMainProp[0];
                                     const item = reducerState.allItems.find((item) => item[mainProp] === params.row[mainProp]);

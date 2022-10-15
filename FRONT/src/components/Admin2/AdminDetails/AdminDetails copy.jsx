@@ -16,84 +16,53 @@ import AdminDetailsChipContainer from './AdminDetailsComponents/AdminDetailsChip
 import AdminDetailsInput from './AdminDetailsComponents/AdminDetailsInput/AdminDetailsInput';
 import AdminDetailsTextArea from './AdminDetailsComponents/AdminDetailsTextArea/AdminDetailsTextArea';
 import AdminDetailsSelect from './AdminDetailsComponents/AdminDetailsSelect/AdminDetailsSelect';
-import AdminDatagrid from '../AdminDatagrid/AdminDatagrid';
-import { referenceSchema } from '../../../Schemas';
 //import Checkbox from '@mui/material/Checkbox';
 
-
 const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids}) => {
-
-    //REDUX FUNCTIONS 
     const { details } = useSelector(state => state);
     const getState = store.getState()[reducer];
+
     const setClose = ()=> store.dispatch(actions.details.setClose());
+    const setContent = (data)=> store.dispatch(actions.details.setContent(data));
 
-    //LOCAL STATES
-    const [currState,setCurrState] = useState(getState);
-    useEffect(()=>{
-        //schema.find()
-        checkIsSubmitable(currState.activeItem,getState.activeItem);
-        setCurrState(getState);
-    },[getState]);
+    //apiSlice[`useGet${details.reducer}Query`]();                 //! Ask to Fetch data need to go in useState?
 
-    const [currSchema,setCurrSche] = useState(schema);
-    const [pK,setPK] = useState(schema);
-    useEffect(()=>{
-        setCurrSche(schema);
 
-        const pkEntr = Object.entries(schema).filter((prop)=>(prop[1].primaryKey));
-        (pkEntr) && setPK(pkEntr[0]);
-    },[schema]);
-
-    //ALERT FEEDBACK
-    const [alert, setAlert] = useState(null);
-    const [errors,setErrors] = useState(false);
-
-    const [submitable,setSubmitable] = useState(false);
+    const apiFetch = (reducer) => {
+        const capitalized = reducer[0].toUpperCase() + reducer.slice(1).toLowerCase();
+        const lowered = reducer.toLowerCase();
+        const res = apiSlice[`useGet${capitalized}Query`]();
+        store.dispatch(actions[lowered].handleFetch(res));
+    }
 
     const [mode,setMode] = useState((modeOverride) ? modeOverride : null);
 
-    //MAIN LOGIC
-
     //Use only schema prop to update api (ex. : user doesn't update password)
     const updatedStuct = () => {
-        const props = Object.keys (currSchema);
+        const props = Object.keys (schema);
         const struct = props.reduce((prev,curr)=>{
             const filledProp = (details) ? details.content[curr] : null;
-            const propIsDisplayed = (filledProp && currSchema[curr].inputDisplay !== 'none') && filledProp;
+            const propIsDisplayed = (filledProp && schema[curr].inputDisplay !== 'none') && filledProp;
             return (propIsDisplayed) ? {...prev,...{[curr]:propIsDisplayed}} : prev;
         }
         ,{});
         return struct;
     }
-
-    const checkIsSubmitable = (curr,newer) => {
-        //Compare two objects
-        //console.log(curr,newer);
-        const newEntries = Object.entries(newer);
-        const current = getState.allItems.find((item)=>newer[pK] === item[pK]);
-        const checkModified = (current) && Object.entries(current).every((entrie)=>{
-            (entrie[1] !== newer[entrie[0]]) && console.log(entrie[1],newer[entrie[0]]);
-            return true
-        })
-
-
-
-    }
-
-    const handleSubmit = () => {
-
-    }
     
+    const [updated,setUpdated] = useState(updatedStuct());
 
+    const [alert, setAlert] = useState(null);
+    const [errors,setErrors] = useState(false);
+    
+    const [isSubmitable,setIsSubmitable] = useState(false);
     
     // eslint-disable-next-line no-unused-vars
     //const [submit,res] = apiSlice[details.submitAction.actionName]();
 
-    //Close details on sche change
+    //Close details on schema change
     // useEffect(()=>{
     //     setClose();
-    // },[sche]);
+    // },[schema]);
 
 
     // const handleSubmit = () => {
@@ -151,14 +120,14 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     //                                     : true;
 
     //     const currentErrors = Object.entries(syncUpdated).map((entrie)=>[entrie[0]                                                  // Array definition [api prop,
-    //                                                         ,(sche[entrie[0]]) && (sche[entrie[0]].regex)                       // errorInfo or if error info doesn't exist 'invalid input' 
-    //                                                                                 ? (!entrie[1].toString().match(sche[entrie[0]].regex))
+    //                                                         ,(schema[entrie[0]]) && (schema[entrie[0]].regex)                       // errorInfo or if error info doesn't exist 'invalid input' 
+    //                                                                                 ? (!entrie[1].toString().match(schema[entrie[0]].regex))
     //                                                                                 : false 
     //                                                         ,entrie[1]]);
 
     //     const errorsWithText = currentErrors.map((error)=> [error[0],
-    //                                             (!error[1]) ? error[1] : (sche[error[0]].errorInfo) 
-    //                                                                         ? sche[error[0]].errorInfo 
+    //                                             (!error[1]) ? error[1] : (schema[error[0]].errorInfo) 
+    //                                                                         ? schema[error[0]].errorInfo 
     //                                                                         : 'Saisie Incorrecte'
     //                                             ,error[2]]);     
 
@@ -175,26 +144,26 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     //               },[details]);
 
     //DYNAMIC TITLE (Default)
-    //Use title prop in sche definition and detail content value to make a dynamic title
+    //Use title prop in schema definition and detail content value to make a dynamic title
     //Else show standard 'Details' string
     //Can be override by titleOverride props
 
     //Structure construction 
-    const titleStruct = (currSchema) && Object.entries(currSchema)                                                                          // ['sche_prop = api data key',order_number]
+    const titleStruct = (schema) && Object.entries(schema)                                                                          // ['schema_prop = api data key',order_number]
                                         .filter(prop => prop[1].title)                                                              //Keep only props used to set title
                                         .sort((a,b)=>{return a[1].title - b[1].title})                                              //Sort by title order from small to big
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
     // Use structure to replace with api data
-    const dynaTitle = (currState.activeItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
-                                                                     ? currSchema[elt].titlePrefix                                      //Concat prefix if exist
+    const dynaTitle = (getState.activeItem) ? titleStruct.map(elt => `${(schema[elt].titlePrefix)                                       //For each key filled in schema : Concat string type titlePrefix + TitleContent
+                                                                     ? schema[elt].titlePrefix                                      //Concat prefix if exist
                                                                      : ''}
-                                                                   ${currState.activeItem[elt]}`)                                        //Use api data to show title
+                                                                   ${getState.activeItem[elt]}`)                                        //Use api data to show title
                                                       .join(' ')
                                         : 'Détails';
 
     //DYNAMIC FIELDS
-    const blocNumb = (currSchema) && [...new Set(Object.entries(currSchema)                                                                 //...new Set naturaly avoid duplicate values
+    const blocNumb = (schema) && [...new Set(Object.entries(schema)                                                                 //...new Set naturaly avoid duplicate values
                                          .map((elt)=> [elt[1].bloc,elt[1].blocTitle,elt[1].field])                                  //ex. : [indexBloc,titleBloc,fieldInput]
                                          .reduce((prev,curr)=>{
                                             const iExist = prev.findIndex((elt)=> elt[0] === curr[0]);                              //Check if another bloc is similar
@@ -309,16 +278,12 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
             imageGallery : () => {//AdminImageGallery render );
                                 console.log('ImageGallery render test');
             },
-            datagrid    : () =>(//AdminDatagrid render or DefailsDatagrid?);
-                <AdminDatagrid
-                    key                     = {name}   
-                    schema                  ={ referenceSchema }
-                    reducer                 ='references'
-                />
-            ),
+            datagrid : () =>{//AdminDatagrid render or DefailsDatagrid?);
+                                console.log('Datagrid render test');
+            },
         }
 
-        return (types[type]) ? types[type]() : types.input()
+        return (types[type]) ? types[type](label,value) : types.input(label,value)
     }
 
 
@@ -332,7 +297,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                     <CloseIcon className='admin-details__header-button--close-icon'/>
                 </div>
                 <div className='admin-details__title'>{(titleOverride) ? titleOverride : dynaTitle}</div>
-                <Button disabled={(!submitable)} onClick={handleSubmit} className='admin-details__header-button' variant="contained">Valider</Button>
+                {/* <Button disabled={(!isSubmitable)} onClick={handleSubmit} className='admin-details__header-button' variant="contained">Valider</Button> */}
             </div>
 
             {/* BLOCS */}
@@ -346,12 +311,12 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                 <div className='admin-details__bloc--inputs'>
 
             {/* INPUTS */}
-                                    {[...Object.entries(currSchema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')     //
+                                    {[...Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')     //
                                                             .sort((a,b)=>{ return a[1].field - b[1].field })                                     //Sort inputs by field
                                                             .map((input) => {
                                                                 return inputType(input[1].inputDisplay,
                                                                                  input[1].label,
-                                                                                 currState.activeItem[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
+                                                                                 (!mode) ? getState.activeItem[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
                                                                                 input[0],
                                                                                 input[1].apiList,
                                                                                 input[1].apiListValueProp,

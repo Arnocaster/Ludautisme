@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-     categories:[]      //!MODIF
+     allItems:[]      //!MODIF
     ,status:null
 }
 
@@ -14,9 +14,9 @@ export default createSlice({
     },
     handleFetch: (state, action) => {
         state.status = action.payload.status;
-        state.categories = (action.payload.data)   //!MODIF
+        state.allItems = (action.payload.data)   //!MODIF
                             ? action.payload.data 
-                            : state.categories;    //!MODIF
+                            : state.allItems;    //!MODIF
     },
     // updateReference:(state,action) => {
     //     console.log('state',state.users,'action',action);
