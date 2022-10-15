@@ -1,6 +1,5 @@
 import React, {useState,useEffect} from 'react';
 import store from '../../../../../store';
-import {useSelector} from 'react-redux';
 import {actions} from '../../../../../store/reducers';
 import { apiSlice } from '../../../../../store/api/apiSlice.js';
 import './admindetailschipcontainer.scss';
@@ -14,65 +13,71 @@ const AdminDetailsChipContainer = ({reducer,
                                     reducerListValueProp,
                                     reducerListLabelProp}) => {
 
+    //UTILITY FUNCTIONS
     const capitalize = (string) => string[0].toUpperCase() + string.slice(1).toLowerCase();
 
-    const { details } = useSelector(state => state);
-    const setDetailContent = (data)=> store.dispatch(actions.details.setContent(data));
-    
-    const [list,setList] = useState([]);
-    const apiList = apiSlice[`useGet${capitalize(reducerList)}Query`](); 
-    const fetchList = () => {
-        store.dispatch(actions[reducerList.toLowerCase()].handleFetch(apiList));
-        const getList = store.getState()[reducerList][reducerList];
-        const idsList = list.map((item) => item[reducerListValueProp]);
-        const cleanedList = getList.filter((item)=> idsList.includes(item[reducerListValueProp]));
-        setList(cleanedList);
+    const getCleanedList = () => {
+        const fullList = [...getList];
+        const alreadyExist = reducerValue.map((prop) => prop[reducerListValueProp]);                        //Get element already displayed
+        const cleanedList = fullList.filter((prop)=> !alreadyExist.includes(prop[reducerListValueProp]));   //Remove existing element from list
+        return (cleanedList) ? cleanedList : [];
     }
-    
-     const [openAutocomplete,setOpenAutocomplete] = useState(false);
 
-    const handleOpenAutocomplete = () => setOpenAutocomplete(true);
+    //REDUX FUNCTIONS
+                        
+    //Get fresh list and store it in redux
+    const apiList = apiSlice[`useGet${capitalize(reducerList)}Query`](); 
+    store.dispatch(actions[reducerList.toLowerCase()].handleFetch(apiList));
+    
+    const getItems= store.getState()[reducer].activeItem[reducerProp];
+    const getList = store.getState()[reducerList].allItems;
+
+    //AUTOCOMPLETE FIELD
+     const [openAutocomplete,setOpenAutocomplete] = useState(false);
+     const handleOpenAutocomplete = () => setOpenAutocomplete(true);
 
      const [value, setValue] = React.useState('');
      const [inputValue, setInputValue] = React.useState('');
 
+     //TO BE IMPLEMENTED
     const [newChip,setNewChip] = useState({});
-
+    
+    //MAIN LOGIC
     const handleRemove = (e) => {
-        // const dataAttr = e.currentTarget.closest('div').dataset.remove.split("-");              // ex. : ['tag','1']
-        // const type = dataAttr[0];                                                               // = name ex. 'tag'
-        // const dataId = (Number.isNaN(dataAttr[1])) ? dataAttr[1] : Number(dataAttr[1]);         // = value ex. 1
-        // const cloned = [...updated[name]];
-        // const removed = cloned.filter((elt) => elt[inputArrayValue] !== dataId)                 //inputArrayValue = prop name who get value ex. for tag : 'id' 
-        //handleChange({target:{name:type,value:removed}});
+        const dataAttr = e.currentTarget.closest('div').dataset.remove.split("-");                  // ex. : ['tag','1']
+        const dataId = (Number.isNaN(dataAttr[1])) ? dataAttr[1] : Number(dataAttr[1]);             // = input value ex. 1
+        const cloned = [...getItems];
+        const removed = cloned.filter((elt) => elt[reducerListValueProp] !== dataId)                 //reducerListValueProp = prop name who get value ex. for tag : 'id' 
+        store.dispatch(actions[reducer].updateActive({[reducerProp]:removed}));
     }
 
-    //Chip exists in list
+    //Add an existing chip
     const handleAddChip = (newValue) => {
-        const itemFound = list.find((item)=> item[reducerListLabelProp] === newValue);
-        const itemCleaned = {[reducerListValueProp]:itemFound[reducerListValueProp],
-                             [reducerListLabelProp]:itemFound[reducerListLabelProp]};
-        const itemFusion = [...details.content[reducerProp],...[itemCleaned]];
-        const updatedDetails = {...details.content, [reducerProp]:itemFusion};
-        setDetailContent(updatedDetails);
-
+        const cloned = [...getItems];                                                               //Actual item list
+        const itemFound = getCleanedList().find((item)=> item[reducerListLabelProp] === newValue); //Find complete item in list (with label)
+        const itemCleaned = {[reducerListValueProp]:itemFound[reducerListValueProp],               //Make a clean item object (clean unused props)
+                              [reducerListLabelProp]:itemFound[reducerListLabelProp]};             
+        const itemFusion = [...cloned,itemCleaned];                                                 //Make an updated array with new item
+        store.dispatch(actions[reducer].updateActive({[reducerProp]:itemFusion}));                  //Send it to the store
+        setValue('');                                                                               //Clear autocomplete
+        setInputValue('');                                                                          //Clear autocomplete
     }
 
-    useEffect(()=>{fetchList()},[])
+    useEffect(()=>{setOpenAutocomplete(false)},[reducerValue]);   //Close autocomplete field on reference switch if selection not validated
 
     return (
         <div className='admin-details__chip--container'>                                
-            {/* {(value) && value.map((val,index) => (
+            {(getItems) && getItems.map((val,index) => (
                             <Chip   className='admin-details__chip--item'
-                                    key={`${name}-${index}`} 
-                                    data-remove={`${name}-${val[inputArrayValue]}`}
-                                    label={val[inputArrayProp]}
+                                    key={`${reducerProp}-${index}`} 
+                                    data-remove={`${reducerProp}-${val[reducerListValueProp]}`}
+                                    label={val[reducerListLabelProp]}
                                     variant="outlined" 
                                     onDelete={handleRemove}
                             />)
-            )} */}
+            )}
             {(!openAutocomplete) && <Button onClick={handleOpenAutocomplete}><AddCircleIcon/></Button>}
-            {(openAutocomplete && list.length) 
+            {(openAutocomplete) 
                 &&  <Autocomplete
                         disablePortal
                         id="combo-box-demo"
@@ -85,7 +90,7 @@ const AdminDetailsChipContainer = ({reducer,
                         onInputChange={(event, newInputValue) => {
                             setInputValue(newInputValue);
                         }}
-                        options={list.map((item)=> item[reducerListLabelProp])}
+                        options={getCleanedList().map((item)=> item[reducerListLabelProp])}
                         sx={{ width: 300 }}
                         renderInput={(params) => <TextField {...params} label={reducerList} />}
                     />              

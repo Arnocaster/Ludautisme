@@ -11,11 +11,11 @@ import { apiSlice } from '../../../store/api/apiSlice.js';
 import {useSelector} from 'react-redux';
 const AdminReferences2 = () => {
 
-    const getReferences = apiSlice.useGetReferencesQuery();              //Mandatory on top-level for useEffect usage
+    //const getReferences = apiSlice.useGetReferencesQuery();              //Mandatory on top-level for useEffect usage
     const { details, references } = useSelector(state => state); //Redux state
 
-    store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
-
+    //store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
+    //console.log(getReferences);
     const buttons = [
         [{label : 'ajouter',
           action : {reducer:'references',mode:'new',submitAction:'useAddReferenceMutation'}
@@ -23,19 +23,19 @@ const AdminReferences2 = () => {
     ]
 
 
-    //Refrech on each render
-    useEffect(()=>{
-        getReferences.refetch(); //Make a refetch clear apiSlice cache
-        store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]);
+    // //Refrech on each render
+    // useEffect(()=>{
+    //     getReferences.refetch(); //Make a refetch clear apiSlice cache
+    //     store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[]);
 
-    //Refetch on detail modification
-    useEffect(()=>{
-        getReferences.refetch(); //Make a refetch clear apiSlice cache
-        store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[details]);
+    // //Refetch on detail modification
+    // useEffect(()=>{
+    //     getReferences.refetch(); //Make a refetch clear apiSlice cache
+    //     store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[details]);
 
     
     return (
@@ -44,19 +44,17 @@ const AdminReferences2 = () => {
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
-                        rows={references.references}
                         schema={referenceSchema}
                         reducer='references'
                         submitAction = 'useUpdateReferenceMutation'
                         />
                 </div>
-                        {(Object.keys(details.content).length > 0 || details.mode === 'new')  &&
-                                <AdminDetails   schema={referenceSchema}
-                                                reducer='references'
-                                              titleOverride={(details.mode === 'new')
-                                                                ?'Nouvel utilisateur'
-                                                                :null}
-                        />}
+                    <AdminDetails   schema={referenceSchema}
+                                    reducer='references'
+                                    titleOverride={(details.mode === 'new')
+                                                    ?'Nouvel utilisateur'
+                                                    :null}
+                    />
             </div>
         </div>
     )

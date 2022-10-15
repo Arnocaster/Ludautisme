@@ -17,9 +17,12 @@ import AdminDetailsChipContainer from './AdminDetailsComponents/AdminDetailsChip
 
 const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids}) => {
     const { details } = useSelector(state => state);
+    const getState = store.getState()[reducer];
+
     const setClose = ()=> store.dispatch(actions.details.setClose());
     const setContent = (data)=> store.dispatch(actions.details.setContent(data));
-    apiSlice[`useGet${details.reducer}Query`]();                 //! Ask to Fetch data need to go in useState?
+
+    //apiSlice[`useGet${details.reducer}Query`]();                 //! Ask to Fetch data need to go in useState?
 
 
     const apiFetch = (reducer) => {
@@ -51,7 +54,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     const [isSubmitable,setIsSubmitable] = useState(false);
     
     // eslint-disable-next-line no-unused-vars
-    const [submit,res] = apiSlice[details.submitAction.actionName]();
+    //const [submit,res] = apiSlice[details.submitAction.actionName]();
 
     //Close details on schema change
     // useEffect(()=>{
@@ -59,82 +62,83 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     // },[schema]);
 
 
-    const handleSubmit = () => {
-        const routeParam = (details.submitAction.params) && details.submitAction.params.param;
+    // const handleSubmit = () => {
+    //     const routeParam = (details.submitAction.params) && details.submitAction.params.param;
 
-        //SPECIAL CASE USER ID_ROLE boolean handled with int true = 2 false = 1;
-        const updatedRoleBoolConv = (typeof(updated.id_role)==='boolean') ? (Number(updated.id_role) === 2) : null;  //Special case user roleHandle IntBoolean convertion
-        const minimalPayload = (updatedRoleBoolConv === null) ? { body:updated } : {body:updated,role:updatedRoleBoolConv};
+    //     //SPECIAL CASE USER ID_ROLE boolean handled with int true = 2 false = 1;
+    //     const updatedRoleBoolConv = (typeof(updated.id_role)==='boolean') ? (Number(updated.id_role) === 2) : null;  //Special case user roleHandle IntBoolean convertion
+    //     const minimalPayload = (updatedRoleBoolConv === null) ? { body:updated } : {body:updated,role:updatedRoleBoolConv};
 
 
-        console.log('minimalPayload',minimalPayload);
-        const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;  //See apiSlice/index {body:{your data},opt. param:1 (param route)}
-        ( isSubmitable && submit ) &&  submit( payload ).unwrap()
-                                                        .then((payload) => {setAlert({severity:'success',message:'Succès'});
-                                                                            setTimeout(()=>{setAlert();
-                                                                                            //setClose();
-                                                                                            },2500);
-                                                                            setContent( payload );
+    //     console.log('minimalPayload',minimalPayload);
+    //     const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;  //See apiSlice/index {body:{your data},opt. param:1 (param route)}
+    //     ( isSubmitable && submit ) &&  submit( payload ).unwrap()
+    //                                                     .then((payload) => {setAlert({severity:'success',message:'Succès'});
+    //                                                                         setTimeout(()=>{setAlert();
+    //                                                                                         //setClose();
+    //                                                                                         },2500);
+    //                                                                         setContent( payload );
                                                                             
-                                                                            })
-                                                        .catch((error) => { console.error('rejected', error);
-                                                                            setAlert( {severity:'error'
-                                                                                       ,message:`${error.status}: ${error.data.message}`});
-                                                                            setTimeout(()=>{setAlert()},6000);
-                                                                            });
-    }
-    const handleChange = (event) => {
-        //Handling regular checkbok event
-        const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
-        //Handling int checkbok event 1 = false 2 = true currently only for user role (27/09/2022)
-        const isIntCheckbox = (event.target.value === '@!ludo_checkbox_int')
-        const IntCheckboxValue = (event.target.checked === true) ? 2 : 1;
+    //                                                                         })
+    //                                                     .catch((error) => { console.error('rejected', error);
+    //                                                                         setAlert( {severity:'error'
+    //                                                                                    ,message:`${error.status}: ${error.data.message}`});
+    //                                                                         setTimeout(()=>{setAlert()},6000);
+    //                                                                         });
+    // };
+
+    // const handleChange = (event) => {
+    //     //Handling regular checkbok event
+    //     const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
+    //     //Handling int checkbok event 1 = false 2 = true currently only for user role (27/09/2022)
+    //     const isIntCheckbox = (event.target.value === '@!ludo_checkbox_int')
+    //     const IntCheckboxValue = (event.target.checked === true) ? 2 : 1;
         
-        const checkBoxValue = (isIntCheckbox) ? IntCheckboxValue : isCheckboxValue;
+    //     const checkBoxValue = (isIntCheckbox) ? IntCheckboxValue : isCheckboxValue;
 
-        //Set new value
-        const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
-                          ? event.target.value
-                          : checkBoxValue;
-        setMode((mode !== 'new') ? 'edit' : mode);
+    //     //Set new value
+    //     const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
+    //                       ? event.target.value
+    //                       : checkBoxValue;
+    //     setMode((mode !== 'new') ? 'edit' : mode);
 
-        //Get update and insert current changement.
-        //console.log('updated',updated,'event',event,'shallow',{[event.target.name]:newValue});
-        const syncUpdated = {...updated,[event.target.name]:newValue};
-        console.log('sync',syncUpdated);
+    //     //Get update and insert current changement.
+    //     //console.log('updated',updated,'event',event,'shallow',{[event.target.name]:newValue});
+    //     const syncUpdated = {...updated,[event.target.name]:newValue};
+    //     console.log('sync',syncUpdated);
 
-        //Check if all inputs are the same
-        //!Strange comportment on users -> member number : return modified(true) after delete and rewrite same value
-        const checkModified = (details && details.mode !== 'new') ?                                                                 //Avoid error if details empty
-                                        !Object.entries(details.content).every(                                                     //Compare every Api data fields and search for a difference
-                                            (entrie)=> Object.keys(syncUpdated).includes(entrie[0])                                 //Defensive : check if all api props exist in current state 
-                                                       && entrie[1] === syncUpdated[entrie[0]]                                      //and check if value is different
-                                        )
-                                        : true;
+    //     //Check if all inputs are the same
+    //     //!Strange comportment on users -> member number : return modified(true) after delete and rewrite same value
+    //     const checkModified = (details && details.mode !== 'new') ?                                                                 //Avoid error if details empty
+    //                                     !Object.entries(details.content).every(                                                     //Compare every Api data fields and search for a difference
+    //                                         (entrie)=> Object.keys(syncUpdated).includes(entrie[0])                                 //Defensive : check if all api props exist in current state 
+    //                                                    && entrie[1] === syncUpdated[entrie[0]]                                      //and check if value is different
+    //                                     )
+    //                                     : true;
 
-        const currentErrors = Object.entries(syncUpdated).map((entrie)=>[entrie[0]                                                  // Array definition [api prop,
-                                                            ,(schema[entrie[0]]) && (schema[entrie[0]].regex)                       // errorInfo or if error info doesn't exist 'invalid input' 
-                                                                                    ? (!entrie[1].toString().match(schema[entrie[0]].regex))
-                                                                                    : false 
-                                                            ,entrie[1]]);
+    //     const currentErrors = Object.entries(syncUpdated).map((entrie)=>[entrie[0]                                                  // Array definition [api prop,
+    //                                                         ,(schema[entrie[0]]) && (schema[entrie[0]].regex)                       // errorInfo or if error info doesn't exist 'invalid input' 
+    //                                                                                 ? (!entrie[1].toString().match(schema[entrie[0]].regex))
+    //                                                                                 : false 
+    //                                                         ,entrie[1]]);
 
-        const errorsWithText = currentErrors.map((error)=> [error[0],
-                                                (!error[1]) ? error[1] : (schema[error[0]].errorInfo) 
-                                                                            ? schema[error[0]].errorInfo 
-                                                                            : 'Saisie Incorrecte'
-                                                ,error[2]]);     
+    //     const errorsWithText = currentErrors.map((error)=> [error[0],
+    //                                             (!error[1]) ? error[1] : (schema[error[0]].errorInfo) 
+    //                                                                         ? schema[error[0]].errorInfo 
+    //                                                                         : 'Saisie Incorrecte'
+    //                                             ,error[2]]);     
 
-        const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                        //Check if there is no error
+    //     const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                        //Check if there is no error
         
-        setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));      //Go back from Entries (array) to object
-        setIsSubmitable((checkModified && checkConform));                                                                             //Set is conform (= conform to submit)
-        setUpdated({...syncUpdated});
-    }
+    //     setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));      //Go back from Entries (array) to object
+    //     setIsSubmitable((checkModified && checkConform));                                                                             //Set is conform (= conform to submit)
+    //     setUpdated({...syncUpdated});
+    // }
 
-    useEffect(()=>{(details) && setUpdated(details.content); 
-                    setIsSubmitable(false);
-                    setUpdated(updatedStuct());
-                  },[details]);
+    // useEffect(()=>{(details) && setUpdated(details.content); 
+    //                 setIsSubmitable(false);
+    //                 setUpdated(updatedStuct());
+    //               },[details]);
 
     //DYNAMIC TITLE (Default)
     //Use title prop in schema definition and detail content value to make a dynamic title
@@ -148,10 +152,10 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
     // Use structure to replace with api data
-    const dynaTitle = (details.content) ? titleStruct.map(elt => `${(schema[elt].titlePrefix)                                       //For each key filled in schema : Concat string type titlePrefix + TitleContent
+    const dynaTitle = (getState.activeItem) ? titleStruct.map(elt => `${(schema[elt].titlePrefix)                                       //For each key filled in schema : Concat string type titlePrefix + TitleContent
                                                                      ? schema[elt].titlePrefix                                      //Concat prefix if exist
                                                                      : ''}
-                                                                   ${details.content[elt]}`)                                        //Use api data to show title
+                                                                   ${getState.activeItem[elt]}`)                                        //Use api data to show title
                                                       .join(' ')
                                         : 'Détails';
 
@@ -188,7 +192,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                         id="demo-simple-select"
                         value={(resValue && list.length) ? resValue : '' }
                         label={name}
-                        onChange={handleChange}
+                        //onChange={handleChange}
                     >
                         {(list) && list.map(elt=><MenuItem key={`${name}-item-${elt.id}`}
                                                           value={elt.id}>{elt.name}
@@ -206,7 +210,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                                 control={<Checkbox name = {name}
                                                                    value = '@!ludo_checkbox' 
                                                                    checked={(value) && value}   //Always send something or mui throw error
-                                                                   onChange = {handleChange}
+                                                                   //onChange = {handleChange}
                                                                    inputProps={{ 'aria-label': 'controlled' }}
                                                                    />
                                                         } 
@@ -223,7 +227,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                                 control={<Checkbox name = {name}
                                                                    value = '@!ludo_checkbox_int' 
                                                                    checked={(cleanedValue)&&(cleanedValue)} //Always send something or mui throw error
-                                                                   onChange = {handleChange}
+                                                                   //onChange = {handleChange}
                                                                    inputProps={{ 'aria-label': 'controlled' }}
                                                                    />
                                                         } 
@@ -238,7 +242,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                             name = {name}
                                             label={(label) ? label : ''}
                                             value={value}
-                                            onChange = {(event) => (event) && (event.toString() !== 'Invalid Date' && event) ? handleChange({target:{name,value:format(event, 'yyyy-MM-dd')}}) : console.log(event)} 
+                                            //onChange = {(event) => (event) && (event.toString() !== 'Invalid Date' && event) ? handleChange({target:{name,value:format(event, 'yyyy-MM-dd')}}) : console.log(event)} 
                                             renderInput={(params) => <TextField {...params} />}
                                         />
                                     </LocalizationProvider>)},
@@ -249,7 +253,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                             key = {name}
                                             label={(label) ? label : ''} 
                                             id="outlined-size-normal"
-                                            onChange = {handleChange} 
+                                            //onChange = {handleChange} 
                                             value={(value) ? value : '' } 
                                             multiline/>),
             input       : () => (<TextField className='admin-details__input'
@@ -259,7 +263,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                             key = {name}
                                             label={(label) ? label : ''} 
                                             id="outlined-size-normal"
-                                            onChange = {handleChange} 
+                                            //onChange = {handleChange} 
                                             value={(value) ? value : '' } />),
             chipList    : () => (
                 <AdminDetailsChipContainer
@@ -296,7 +300,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                     <CloseIcon className='admin-details__header-button--close-icon'/>
                 </div>
                 <div className='admin-details__title'>{(titleOverride) ? titleOverride : dynaTitle}</div>
-                <Button disabled={(!isSubmitable)} onClick={handleSubmit} className='admin-details__header-button' variant="contained">Valider</Button>
+                {/* <Button disabled={(!isSubmitable)} onClick={handleSubmit} className='admin-details__header-button' variant="contained">Valider</Button> */}
             </div>
 
             {/* BLOCS */}
@@ -310,13 +314,12 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                 <div className='admin-details__bloc--inputs'>
 
             {/* INPUTS */}
-                                    {Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')     //
+                                    {[...Object.entries(schema).filter((input) => input[1].bloc === bloc[0] && input[1].inputDisplay !== 'none')     //
                                                             .sort((a,b)=>{ return a[1].field - b[1].field })                                     //Sort inputs by field
-                                                            .map((input)=>{
-                                                                // console.log(input);
+                                                            .map((input) => {
                                                                 return inputType(input[1].inputDisplay,
                                                                                  input[1].label,
-                                                                                 (!mode) ? details.content[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
+                                                                                 (!mode) ? getState.activeItem[input[0]] : updated[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
                                                                                 input[0],
                                                                                 input[1].apiList,
                                                                                 input[1].apiListValueProp,
@@ -324,7 +327,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                                                                 );
                                                                 }
 
-                                    )}
+                                    )]}
                                 </div>
 
                             </div>)}

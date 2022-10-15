@@ -1757,10 +1757,29 @@ INSERT INTO "booking"(id,id_user,id_permanency,delivered,closed,nb_prolongation)
 INSERT INTO "booking"(id,id_user,id_permanency,delivered,closed,nb_prolongation) OVERRIDING SYSTEM VALUE VALUES (1756,131,45,'true','true',0);
 INSERT INTO "booking"(id,id_user,id_permanency,delivered,closed,nb_prolongation) OVERRIDING SYSTEM VALUE VALUES (1757,104,64,'true','true',0);
 
+
 --Set la séquence identity a la valeur max(id) booking, obligatoire après forcage des id a l'import 
 WITH const (seq_name, booking_max_id) as (
    SELECT pg_get_serial_sequence('booking', 'id'), max(id) FROM "booking"
 )
 SELECT setval (seq_name, booking_max_id) FROM const;
+
+
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (113,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (17,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (24,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (29,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (43,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (46,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (58,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (64,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (69,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (86,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (104,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (114,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (120,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (138,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (139,120,'false','false',0);
+INSERT INTO "booking"(id_user,id_permanency,delivered,closed,nb_prolongation) VALUES (140,120,'false','false',0);
 
 COMMIT;

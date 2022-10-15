@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-     references:[]      //!MODIF
+     allItems:[]      //!MODIF
+    ,activeItem : {}
     ,status:null
 }
 
@@ -14,12 +15,13 @@ export default createSlice({
     },
     handleFetch: (state, action) => {
         state.status = action.payload.status;
-        state.references = (action.payload.data)   //!MODIF
+        state.allItems = (action.payload.data)   //!MODIF
                             ? action.payload.data 
-                            : state.references;
+                            : state.allItems;
     },
-    update:(state,action) => {
-        console.log('state',state.users,'action',action);
+    updateActive:(state,action) => {
+        console.log('state',state.users,'action',action, {...state.activeItem,...action.payload});
+        state.activeItem = {...state.activeItem,...action.payload};
         //const user = state.user.find((user)=>user.id === action.payload.id);
         //console.log(user);
     },
@@ -28,9 +30,15 @@ export default createSlice({
         const entries = Object.entries(action.payload);
         const prop = entries[0];
         const value = entries[1];
-        const removedArr = state.users[prop].filter((val)=> val !== value);
+        const removedArr = state.allItems[prop].filter((val)=> val !== value);
         console.log(removedArr);
         //console.log(user);
+    },
+    setActiveItem:(state,action) => {
+        state.activeItem = {...action.payload};
+    },
+    clearActiveItem:(state,action) => {
+        state.active = {};
     }
   },
 })

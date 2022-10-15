@@ -4,7 +4,8 @@ const referenceSchema  = {
         label: "Modifier référence",
         gridDisplay: "edit",
         width: 200,
-        inputDisplay:"none"
+        inputDisplay:"none",
+        mainProp : true,
     },
     name:{
         type : "string",
