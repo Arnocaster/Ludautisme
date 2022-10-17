@@ -26,6 +26,7 @@ const AdminDetailsTextArea = ({reducer,
     const handleChange = (event) => {
         const newValue = event.target.value;
         store.dispatch(actions[reducer].updateActive({[reducerProp]:newValue}));
+        setValue(newValue);
     }
 
 

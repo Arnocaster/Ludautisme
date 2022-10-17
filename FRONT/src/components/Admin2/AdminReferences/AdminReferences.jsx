@@ -12,35 +12,21 @@ import {useSelector} from 'react-redux';
 const AdminReferences2 = () => {
 
     //const getReferences = apiSlice.useGetReferencesQuery();              //Mandatory on top-level for useEffect usage
-    const { details, references } = useSelector(state => state); //Redux state
+    const { details} = useSelector(state => state); //Redux state
 
     //store.dispatch(actions.references.handleFetch(getReferences)); //First loading only, fetch an store api
     //console.log(getReferences);
-    const [buttons,setButtons] = useState([
+    const [buttons,setButtons] = useState([]);
+
+    useEffect(()=>{setButtons([
         [{label : 'ajouter',
           action : {reducer:'references',mode:'new',submitAction:'useAddReferenceMutation'}
         }]
-    ]);
-
-
-    // //Refrech on each render
-    // useEffect(()=>{
-    //     getReferences.refetch(); //Make a refetch clear apiSlice cache
-    //     store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // },[]);
-
-    // //Refetch on detail modification
-    // useEffect(()=>{
-    //     getReferences.refetch(); //Make a refetch clear apiSlice cache
-    //     store.dispatch(actions.references.handleFetch(getReferences));//Read refetch
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // },[details]);
-
+    ])},[])
     
     return (
         <div className = 'adminReferences'>
-            <AdminDashboardMenu title='Références' buttons={[...buttons]}/>
+            <AdminDashboardMenu title='Références' buttons={buttons} reducer='references'/>
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
@@ -51,7 +37,7 @@ const AdminReferences2 = () => {
                     <AdminDetails   schema={referenceSchema}
                                     reducer='references'
                                     titleOverride={(details.mode === 'new')
-                                                    ?'Nouvel utilisateur'
+                                                    ?'Nouvelle Référence'
                                                     :null}
                     />
             </div>

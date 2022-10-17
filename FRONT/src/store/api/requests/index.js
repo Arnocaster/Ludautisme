@@ -33,7 +33,7 @@ export const initEndpoints = (builder) =>{
                                                 query: (payload) => ({
                                                     url:`${endpoint.query}${(payload.param)?payload.param:''}`,
                                                     method: 'POST',
-                                                    body: payload.body,
+                                                    body: cleanPayload(payload.body),
                                                 }),
                                                 //invalidatesTags: ['Post'],
                                             }),

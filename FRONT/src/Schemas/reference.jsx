@@ -30,6 +30,8 @@ const referenceSchema  = {
         gridDisplay : "normal",
         width : 150,
         bloc : 1,
+        regex : /^-?[\d]*$/g,
+        errorInfo : 'La saisie doit être un nombre'
     },
     main_category:{
         type : "number",

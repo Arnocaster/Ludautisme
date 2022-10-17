@@ -17,8 +17,8 @@ const AdminDetailsChipContainer = ({reducer,
     const capitalize = (string) => string[0].toUpperCase() + string.slice(1).toLowerCase();
 
     const getCleanedList = () => {
-        const fullList = [...getList];
-        const alreadyExist = reducerValue.map((prop) => prop[reducerListValueProp]);                        //Get element already displayed
+        const fullList = [...list];
+        const alreadyExist = [...items].map((prop) => prop[reducerListValueProp]);                        //Get element already displayed
         const cleanedList = fullList.filter((prop)=> !alreadyExist.includes(prop[reducerListValueProp]));   //Remove existing element from list
         return (cleanedList) ? cleanedList : [];
     }
@@ -27,24 +27,30 @@ const AdminDetailsChipContainer = ({reducer,
                         
     //Get fresh list and store it in redux
     const apiList = apiSlice[`useGet${capitalize(reducerList)}Query`](); 
-    store.dispatch(actions[reducerList.toLowerCase()].handleFetch(apiList));
     
     const getItems= store.getState()[reducer].activeItem[reducerProp];
     const getList = store.getState()[reducerList].allItems;
 
     //LOCAL STATES
+    const [list,setList] = useState([]);
+    useEffect(()=>{const {status} = apiList;
+                    (status === 'fulfilled') &&  store.dispatch(actions[reducerList].handleFetch(apiList));
+                    (status === 'fulfilled') && setList(apiList.data);}
+              ,[apiList,reducerList]
+    );
 
     //AUTOCOMPLETE FIELD
      const [openAutocomplete,setOpenAutocomplete] = useState(false);
      const handleOpenAutocomplete = () => setOpenAutocomplete(true);
-     useEffect(()=>{setOpenAutocomplete(false)},[reducerValue]);   //Close autocomplete field on reference switch if selection not validated
+
 
      const [value, setValue] = React.useState();
      const [inputValue, setInputValue] = React.useState();
 
      const [items,setItems] = useState([]);
-     useEffect(()=>{(getItems) && setItems(getItems);},[getItems,reducerListValueProp]);
-     
+     useEffect(()=>{setItems((getItems)?getItems:[]);},[getItems,reducerListValueProp]);
+    //Close autocomplete field on reference switch if selection not validated
+     useEffect(()=>{setOpenAutocomplete(false)},[items]);
      //TO BE IMPLEMENTED, NEW SHIP SHORTCUT
     const [newChip,setNewChip] = useState({});
     
@@ -55,6 +61,7 @@ const AdminDetailsChipContainer = ({reducer,
         const cloned = [...items];
         const removed = cloned.filter((elt) => elt[reducerListValueProp] !== dataId)                 //reducerListValueProp = prop name who get value ex. for tag : 'id' 
         store.dispatch(actions[reducer].updateActive({[reducerProp]:removed}));
+        setItems(removed);
     }
 
     //Add an existing chip

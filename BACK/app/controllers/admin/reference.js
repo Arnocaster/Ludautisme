@@ -24,21 +24,36 @@ module.exports = {
         return res.json(results);
     },
     async addRef(req, res) {
-        const reference = await referenceDataMapper.findByName(req.body.name);
+        const { body } = req;
+        const reference = await referenceDataMapper.findByName(body.name);
         if (reference.length > 0) {
             throw new ApiError(400, 'Une référence avec le même nom existe déjà');
         }
-        const newRef = await referenceDataMapper.create(req.body);
+
+        const cleanedBody = { ...body };
+        delete cleanedBody.tag;
+        delete cleanedBody.picture;
+        if (!cleanedBody.name || cleanedBody.name.length < 1) {
+            throw new ApiError(400, 'La référence n\'a pas de nom');
+        }
+        const newRef = await referenceDataMapper.create(cleanedBody);
         if (!newRef) {
             throw new ApiError(500, 'Impossible de créer la référence');
         }
-        if (!req.body.picture) {
-            req.body.picture = 6;
+
+        if (body.tag) {
+            body.tag.forEach(
+                async (tag) => await tagDataMapper.addTagToReference(newRef.id, tag.id),
+            );
         }
-        const picture = await pictureDataMapper.addRelation(newRef.id, req.body.picture);
-        if (picture[0]) {
-            throw new ApiError(500, 'Impossible d\'ajouter l\'image');
+
+        if (body.picture) {
+            const picture = await pictureDataMapper.addRelation(newRef.id, req.body.picture);
+            if (picture[0]) {
+                throw new ApiError(500, 'Impossible d\'ajouter l\'image');
+            }
         }
+
         return res.json(newRef);
     },
     async update(req, res) {

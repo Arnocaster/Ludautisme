@@ -21,6 +21,7 @@ const AdminDetailsSelect = ({
     //Get fresh list and store it in redux
     const apiList = apiSlice[`useGet${capitalize(reducerList)}Query`](); 
     const getValue = store.getState()[reducer].activeItem[reducerProp];
+
     //LOCAL STATES
     const [list,setList] = useState([]);
     useEffect(()=>{const {status} = apiList;
@@ -37,7 +38,7 @@ const AdminDetailsSelect = ({
     const handleChange = (event) => {
         const newValue = event.target.value;
         store.dispatch(actions[reducer].updateActive({[reducerProp]:newValue}));
-
+        setValue(newValue);
     }
 
     return (

@@ -117,7 +117,7 @@ const AdminDatagrid = ({
                                 store.dispatch(details.actions.setReducer(reducer));
                                 // store.dispatch(details.actions.setSubmitPayload({actionName:submitAction,params :{param:params.row.id, body:params.row}}));
                                 // store.dispatch(details.actions.setContent(params.row));
-                                // store.dispatch(details.actions.setMode());
+                                store.dispatch(details.actions.setMode(''));
                                 store.dispatch(details.actions.setOpen());
                               }
                           }

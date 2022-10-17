@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import store from '../../../store';
 import {actions} from '../../../store/reducers';
@@ -6,24 +6,25 @@ import './admindashboardmenu.scss';
 import CircularProgress from '@mui/material/CircularProgress';
 import {Button} from '@mui/material';
 
-const AdminDashboardMenu = ({title, buttons}) => {
+const AdminDashboardMenu = ({title, buttons,reducer}) => {
     const { details, users } = useSelector(state => state); //Redux state 
 
     const handleNewElement = (params) => {
-        console.log(params.submitAction,actions);
-        store.dispatch(actions.details.setContent({}));
-        store.dispatch(actions.details.setReducer(params.reducer));
-        store.dispatch(actions.details.setSubmitPayload({actionName:params.submitAction}));
         store.dispatch(actions.details.setMode('new'));
+        store.dispatch(actions[reducer].clearActiveItem());
+        store.dispatch(actions[reducer].setActiveItem({}));
         store.dispatch(actions.details.setOpen());
-        //store.dispatch(details.action.setSubmitPayload());
     }
 
     const [btns,setBtns] = useState(buttons);
+    useEffect(()=>{setBtns(buttons)},[buttons]);
+
+     const [tit,setTit] = useState(title);
+    useEffect(()=>{setTit(title)},[title])
 
     return (
         <div className='admin-dashboardmenu'>
-            <div className='admin-dashboardmenu__title'>{title}</div>
+            <div className='admin-dashboardmenu__title'>{tit}</div>
             <div className='admin-dashboardmenu__container'>
                 {btns.map((bloc,index) => {return (
                     <div key={`bloc_${index}`}>

@@ -5,7 +5,6 @@ import {useSelector} from 'react-redux';
 import {actions} from '../../../store/reducers';
 import { apiSlice } from '../../../store/api/apiSlice.js';
 import CloseIcon from '@mui/icons-material/Close';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {FormControlLabel,Checkbox,TextField,Button,Snackbar,Alert,Select,MenuItem,Chip } from '@mui/material/';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -23,156 +22,133 @@ import { referenceSchema } from '../../../Schemas';
 
 const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids}) => {
 
+    //UTILITY FUNCTIONS
+
+    const capitalize = (string) => string[0].toUpperCase() + string.slice(1).toLowerCase();
+
+    //Return true if two object are perfectly identical
+    const deepComparison = (first, second) => {
+
+        /* Checking if the types and values of the two arguments are the same. */
+        if(first === second) return true
+
+        /* Checking if any arguments are null */
+        if(first === null || second === null) return false
+
+        /* Checking if any argument is none object */
+        if(typeof first !== 'object'  || typeof second !== 'object') return false
+
+        /* Using Object.getOwnPropertyNames() method to return the list of the objects’ properties */
+        let first_keys = Object.getOwnPropertyNames(first);
+        let second_keys = Object.getOwnPropertyNames(second);
+
+        /* Checking if the objects' length are same*/
+        if(first_keys.length !== second_keys.length) return false;
+
+        /* Iterating through all the properties of the first object with the for of method*/
+        for(let key of first_keys) {
+            /* Making sure that every property in the first object also exists in second object. */ 
+            if(!Object.hasOwn(second, key)) return false
+            /* Using the deepComparison function recursively (calling itself) and passing the values of each property into it to check if they are equal. */
+            if (deepComparison(first[key], second[key]) === false) return false
+        }
+        /* if no case matches, returning true */ 
+        return true
+    }
+
+    const getSubmitActionString = () => {
+        const capitalizedReducer = capitalize(reducer);
+        const newItem = (details.mode === 'new') && `useAdd${capitalizedReducer}Mutation`;
+        const removeItem = (!newItem && modeOverride === 'remove') && `useRemove${capitalizedReducer}Mutation`;
+        const updateItem = (!removeItem) && `useUpdate${capitalizedReducer}Mutation`;
+        return (newItem) ? newItem : (removeItem) ? removeItem : updateItem;
+    }
+
     //REDUX FUNCTIONS 
     const { details } = useSelector(state => state);
-    const getState = store.getState()[reducer];
+    const getListItems = store.getState()[reducer].allItems;
+    const getActiveItem = store.getState()[reducer].activeItem;
+    const getErrors = store.getState()[reducer].activeErrors;
+
+    
+    const clearActiveItem = ()=> store.dispatch(actions[reducer].clearActiveItem());
+    const refetchItems = apiSlice[`useGet${capitalize(reducer)}Query`]().refetch;
     const setClose = ()=> store.dispatch(actions.details.setClose());
 
     //LOCAL STATES
-    const [currState,setCurrState] = useState(getState);
-    useEffect(()=>{
-        //schema.find()
-        checkIsSubmitable(currState.activeItem,getState.activeItem);
-        setCurrState(getState);
-    },[getState]);
 
-    const [currSchema,setCurrSche] = useState(schema);
+    const [currActiveItem,setCurrActiveItem] = useState({});
+    useEffect(()=>{ 
+        (getActiveItem[pK] !== currActiveItem[pK]) 
+            ? setSubmitable(false) 
+            : checkIsSubmitable();
+        setCurrActiveItem({...getActiveItem});
+    },[getActiveItem]);
+
+    useEffect(()=>{
+        (details.mode === 'new') && clearActiveItem();
+        (details.mode === 'new') && setCurrActiveItem({});
+        setSubmitString(getSubmitActionString());
+        // console.log((details.mode === 'new'),currActiveItem);
+    },[details])
+
+    const [currListItems,setCurrListItems] = useState([...getListItems]);
+    //useEffect(()=>{setCurrListItems([...getListItems]);},[getListItems]);
+
+    //SCHEMA 
+    const [currSchema,setCurrSchema] = useState(schema);
     const [pK,setPK] = useState(schema);
-    useEffect(()=>{
-        setCurrSche(schema);
 
+    useEffect(()=>{
+        setCurrSchema(schema);
         const pkEntr = Object.entries(schema).filter((prop)=>(prop[1].primaryKey));
-        (pkEntr) && setPK(pkEntr[0]);
+        (pkEntr) && setPK(pkEntr[0][0]);
     },[schema]);
+
+    //SUBMIT
+    const [submitString,setSubmitString] = useState(getSubmitActionString());
+    const [submit] = apiSlice[submitString]();
+    const [submitable,setSubmitable] = useState(false);
 
     //ALERT FEEDBACK
     const [alert, setAlert] = useState(null);
-    const [errors,setErrors] = useState(false);
-
-    const [submitable,setSubmitable] = useState(false);
-
-    const [mode,setMode] = useState((modeOverride) ? modeOverride : null);
 
     //MAIN LOGIC
 
-    //Use only schema prop to update api (ex. : user doesn't update password)
-    const updatedStuct = () => {
-        const props = Object.keys (currSchema);
-        const struct = props.reduce((prev,curr)=>{
-            const filledProp = (details) ? details.content[curr] : null;
-            const propIsDisplayed = (filledProp && currSchema[curr].inputDisplay !== 'none') && filledProp;
-            return (propIsDisplayed) ? {...prev,...{[curr]:propIsDisplayed}} : prev;
-        }
-        ,{});
-        return struct;
+    const checkIsSubmitable = () => {
+        const newer = {...getActiveItem};
+        const current = currListItems.find((item)=>newer[pK] === item[pK]);
+        const errors = Object.keys(getErrors).length > 0; 
+        const isSubmitable = (!deepComparison(current,newer) && !errors);
+        (submitable !== isSubmitable) && setSubmitable(isSubmitable);
     }
-
-    const checkIsSubmitable = (curr,newer) => {
-        //Compare two objects
-        //console.log(curr,newer);
-        const newEntries = Object.entries(newer);
-        const current = getState.allItems.find((item)=>newer[pK] === item[pK]);
-        const checkModified = (current) && Object.entries(current).every((entrie)=>{
-            (entrie[1] !== newer[entrie[0]]) && console.log(entrie[1],newer[entrie[0]]);
-            return true
-        })
-
-
-
-    }
-
     const handleSubmit = () => {
-
+        const routeParam = (details.mode !== 'new') && getActiveItem[pK];
+        console.log(currActiveItem);
+        const cleanedPayloadData = Object.entries(getActiveItem)
+                                  .filter((entrie)=>{
+                                    const isDisplayed = (currSchema[entrie[0]]) &&  (currSchema[entrie[0]].inputDisplay !== 'none'); 
+                                    return entrie[0] !== pK && isDisplayed;
+                                    });
+        const payloadData = Object.fromEntries(cleanedPayloadData);
+        const fullPayload = (routeParam) ? {body:payloadData,param:routeParam} : {body:payloadData};
+        console.log(fullPayload);
+        (submitable) && submit(fullPayload).unwrap()
+                                            .then((payload) => {setAlert({severity:'success',message:'Succès'});
+                                                                setTimeout(()=>{setAlert();
+                                                                                //setClose();
+                                                                                },2500);
+                                                                refetchItems();
+                                                                setSubmitable(false);
+                                                                //.setCurrActiveItem( payload );
+                                                                
+                                                                })
+                                            .catch((error) => { console.error('rejected', error);
+                                                                setAlert( {severity:'error'
+                                                                            ,message:`${error.status}: ${error.data.message}`});
+                                                                setTimeout(()=>{setAlert()},6000);
+                                                                });
     }
-    
-
-    
-    // eslint-disable-next-line no-unused-vars
-    //const [submit,res] = apiSlice[details.submitAction.actionName]();
-
-    //Close details on sche change
-    // useEffect(()=>{
-    //     setClose();
-    // },[sche]);
-
-
-    // const handleSubmit = () => {
-    //     const routeParam = (details.submitAction.params) && details.submitAction.params.param;
-
-    //     //SPECIAL CASE USER ID_ROLE boolean handled with int true = 2 false = 1;
-    //     const updatedRoleBoolConv = (typeof(updated.id_role)==='boolean') ? (Number(updated.id_role) === 2) : null;  //Special case user roleHandle IntBoolean convertion
-    //     const minimalPayload = (updatedRoleBoolConv === null) ? { body:updated } : {body:updated,role:updatedRoleBoolConv};
-
-
-    //     console.log('minimalPayload',minimalPayload);
-    //     const payload = (routeParam) ? {...minimalPayload,param:routeParam} : minimalPayload;  //See apiSlice/index {body:{your data},opt. param:1 (param route)}
-    //     ( isSubmitable && submit ) &&  submit( payload ).unwrap()
-    //                                                     .then((payload) => {setAlert({severity:'success',message:'Succès'});
-    //                                                                         setTimeout(()=>{setAlert();
-    //                                                                                         //setClose();
-    //                                                                                         },2500);
-    //                                                                         setContent( payload );
-                                                                            
-    //                                                                         })
-    //                                                     .catch((error) => { console.error('rejected', error);
-    //                                                                         setAlert( {severity:'error'
-    //                                                                                    ,message:`${error.status}: ${error.data.message}`});
-    //                                                                         setTimeout(()=>{setAlert()},6000);
-    //                                                                         });
-    // };
-
-    // const handleChange = (event) => {
-    //     //Handling regular checkbok event
-    //     const isCheckboxValue = (event.target.value === '@!ludo_checkbox') ? event.target.checked : null;
-    //     //Handling int checkbok event 1 = false 2 = true currently only for user role (27/09/2022)
-    //     const isIntCheckbox = (event.target.value === '@!ludo_checkbox_int')
-    //     const IntCheckboxValue = (event.target.checked === true) ? 2 : 1;
-        
-    //     const checkBoxValue = (isIntCheckbox) ? IntCheckboxValue : isCheckboxValue;
-
-    //     //Set new value
-    //     const newValue = (checkBoxValue === null)                                                                 //Hack to identify checkbox cause value is in checked not in value
-    //                       ? event.target.value
-    //                       : checkBoxValue;
-    //     setMode((mode !== 'new') ? 'edit' : mode);
-
-    //     //Get update and insert current changement.
-    //     //console.log('updated',updated,'event',event,'shallow',{[event.target.name]:newValue});
-    //     const syncUpdated = {...updated,[event.target.name]:newValue};
-    //     console.log('sync',syncUpdated);
-
-    //     //Check if all inputs are the same
-    //     //!Strange comportment on users -> member number : return modified(true) after delete and rewrite same value
-    //     const checkModified = (details && details.mode !== 'new') ?                                                                 //Avoid error if details empty
-    //                                     !Object.entries(details.content).every(                                                     //Compare every Api data fields and search for a difference
-    //                                         (entrie)=> Object.keys(syncUpdated).includes(entrie[0])                                 //Defensive : check if all api props exist in current state 
-    //                                                    && entrie[1] === syncUpdated[entrie[0]]                                      //and check if value is different
-    //                                     )
-    //                                     : true;
-
-    //     const currentErrors = Object.entries(syncUpdated).map((entrie)=>[entrie[0]                                                  // Array definition [api prop,
-    //                                                         ,(sche[entrie[0]]) && (sche[entrie[0]].regex)                       // errorInfo or if error info doesn't exist 'invalid input' 
-    //                                                                                 ? (!entrie[1].toString().match(sche[entrie[0]].regex))
-    //                                                                                 : false 
-    //                                                         ,entrie[1]]);
-
-    //     const errorsWithText = currentErrors.map((error)=> [error[0],
-    //                                             (!error[1]) ? error[1] : (sche[error[0]].errorInfo) 
-    //                                                                         ? sche[error[0]].errorInfo 
-    //                                                                         : 'Saisie Incorrecte'
-    //                                             ,error[2]]);     
-
-    //     const checkConform = (currentErrors) && currentErrors.every((entrie)=> (!entrie[1]) );                                        //Check if there is no error
-        
-    //     setErrors((!checkConform) && errorsWithText.reduce((prev,curr)=>{return { ...prev, ...{[`${curr[0]}`]:curr[1]} } },{}));      //Go back from Entries (array) to object
-    //     setIsSubmitable((checkModified && checkConform));                                                                             //Set is conform (= conform to submit)
-    //     setUpdated({...syncUpdated});
-    // }
-
-    // useEffect(()=>{(details) && setUpdated(details.content); 
-    //                 setIsSubmitable(false);
-    //                 setUpdated(updatedStuct());
-    //               },[details]);
 
     //DYNAMIC TITLE (Default)
     //Use title prop in sche definition and detail content value to make a dynamic title
@@ -186,10 +162,10 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
     // Use structure to replace with api data
-    const dynaTitle = (currState.activeItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
+    const dynaTitle = (currActiveItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
                                                                      ? currSchema[elt].titlePrefix                                      //Concat prefix if exist
                                                                      : ''}
-                                                                   ${currState.activeItem[elt]}`)                                        //Use api data to show title
+                                                                   ${currActiveItem[elt]}`)                                        //Use api data to show title
                                                       .join(' ')
                                         : 'Détails';
 
@@ -287,6 +263,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                 <AdminDetailsInput
                     key                     = {name}
                     label                   = {label}
+                    schema                  = {schema}
                     reducer                 = {reducer}
                     reducerValue            = {value}
                     reducerProp             = {name}
@@ -351,7 +328,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                                             .map((input) => {
                                                                 return inputType(input[1].inputDisplay,
                                                                                  input[1].label,
-                                                                                 currState.activeItem[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
+                                                                                 currActiveItem[input[0]],           //Mode is not set : display api infos else inputs are modified or new :display local info
                                                                                 input[0],
                                                                                 input[1].apiList,
                                                                                 input[1].apiListValueProp,

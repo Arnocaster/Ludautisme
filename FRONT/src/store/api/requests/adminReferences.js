@@ -2,7 +2,7 @@
 export const adminReferences = {
     // getUser:'',
     getReferences: { query:() => '/references' },       //useGetReferencesQuery
-    addReference:{type:'POST',query:'/references/'},    //useAddReferenceMutation
-    updateReference:{type:'PUT',query:'/references/'}, //useUpdateReferenceMutation
+    addReferences:{type:'POST',query:'/references'},    //useAddReferencesMutation
+    updateReferences:{type:'PUT',query:'/references/'}, //useUpdateReferencesMutation
     // deleteOne:'',
 }

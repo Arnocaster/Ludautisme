@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
      allItems:[]      //!MODIF
     ,activeItem : {}
+    ,activeErrors : {}
     ,status:null
 }
 
@@ -20,13 +21,27 @@ export default createSlice({
                             : state.allItems;
     },
     updateActive:(state,action) => {
-        console.log('state',state.users,'action',action, {...state.activeItem,...action.payload});
-        state.activeItem = {...state.activeItem,...action.payload};
-        //const user = state.user.find((user)=>user.id === action.payload.id);
-        //console.log(user);
+        console.log('updateActive');
+        //console.log('state',state.activeItem,'action',action, {...state.activeItem,...action.payload});
+        const cleanedPayload = {...action.payload};
+        const emptyEntries = Object.entries(action.payload).filter((entrie)=> entrie[1].length < 1).map((ent)=>ent[0]);
+        emptyEntries.forEach((ent)=> {delete cleanedPayload[ent]; delete state.activeItem[ent];});
+        console.log(cleanedPayload);
+        state.activeItem = {...state.activeItem,...cleanedPayload};
+    },
+    updateError:(state,action) => {
+        console.log('updateError');
+        state.activeErrors = {...state.activeErrors,...action.payload};
+    },
+    removeError:(state,action) => {
+        console.log('removeError');
+        const propToRemove = Object.keys(action.payload)[0];
+        const removedError = {...state.activeErrors}
+        delete removedError[propToRemove];
+        state.activeErrors = (removedError) ? {...removedError} : {};
     },
     removeOne:(state,action) => {
-        console.log('state',state.users,'action',action);
+        console.log('removeOne from allItems');
         const entries = Object.entries(action.payload);
         const prop = entries[0];
         const value = entries[1];
@@ -38,7 +53,7 @@ export default createSlice({
         state.activeItem = {...action.payload};
     },
     clearActiveItem:(state,action) => {
-        state.active = {};
+        state.activeItem = {};
     }
   },
 })
