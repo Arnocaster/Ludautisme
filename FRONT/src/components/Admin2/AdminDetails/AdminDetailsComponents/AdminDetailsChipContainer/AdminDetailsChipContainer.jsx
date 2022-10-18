@@ -27,9 +27,7 @@ const AdminDetailsChipContainer = ({reducer,
                         
     //Get fresh list and store it in redux
     const apiList = apiSlice[`useGet${capitalize(reducerList)}Query`](); 
-    
     const getItems= store.getState()[reducer].activeItem[reducerProp];
-    const getList = store.getState()[reducerList].allItems;
 
     //LOCAL STATES
     const [list,setList] = useState([]);
@@ -67,11 +65,12 @@ const AdminDetailsChipContainer = ({reducer,
     //Add an existing chip
     const handleAddChip = (newValue) => {
         const cloned = [...items];                                                               //Actual item list
-        const itemFound = getCleanedList().find((item)=> item[reducerListLabelProp] === newValue); //Find complete item in list (with label)
+        const itemFound = list.find((item)=> item[reducerListLabelProp] === newValue); //Find complete item in list (with label)
         const itemCleaned = {[reducerListValueProp]:itemFound[reducerListValueProp],               //Make a clean item object (clean unused props)
                               [reducerListLabelProp]:itemFound[reducerListLabelProp]};             
         const itemFusion = [...cloned,itemCleaned];                                                 //Make an updated array with new item
-        store.dispatch(actions[reducer].updateActive({[reducerProp]:itemFusion}));                  //Send it to the store
+        store.dispatch(actions[reducer].updateActive({[reducerProp]:itemFusion}));
+        setItems([...items],itemCleaned);                  //Send it to the store
         setValue();                                                                               //Clear autocomplete
         setInputValue();
         setOpenAutocomplete(false);                                                                         //Clear autocomplete
@@ -102,7 +101,7 @@ const AdminDetailsChipContainer = ({reducer,
                         onInputChange={(event, newInputValue) => {
                             setInputValue(newInputValue);
                         }}
-                        options={getCleanedList().map((item)=> item[reducerListLabelProp])}
+                        options={list.map((item)=> item[reducerListLabelProp])}
                         sx={{ width: 300 }}
                         renderInput={(params) => <TextField {...params} label={reducerList} />}
                     />              

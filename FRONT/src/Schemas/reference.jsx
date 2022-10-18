@@ -59,12 +59,14 @@ const referenceSchema  = {
     },
     reference:{
         type : "number",
-        label : "tag",
+        label : "article",
         gridDisplay : "none",
         //gridArrayProp : 'name',
         width : 250,
         inputDisplay : 'datagrid',
-        apiList : 'references',
+        schema : 'articleSchema',
+        reducer : 'articles',
+        apiList : 'referenceSchema',
         apiListValueProp : 'id',
         apiListLabelProp : 'name',
         bloc : 4

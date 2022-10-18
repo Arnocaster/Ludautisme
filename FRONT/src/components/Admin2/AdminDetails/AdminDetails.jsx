@@ -16,7 +16,8 @@ import AdminDetailsInput from './AdminDetailsComponents/AdminDetailsInput/AdminD
 import AdminDetailsTextArea from './AdminDetailsComponents/AdminDetailsTextArea/AdminDetailsTextArea';
 import AdminDetailsSelect from './AdminDetailsComponents/AdminDetailsSelect/AdminDetailsSelect';
 import AdminDatagrid from '../AdminDatagrid/AdminDatagrid';
-import { referenceSchema } from '../../../Schemas';
+//import { referenceSchema } from '../../../Schemas';
+import schemas from '../../../Schemas';
 //import Checkbox from '@mui/material/Checkbox';
 
 
@@ -96,12 +97,13 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     //useEffect(()=>{setCurrListItems([...getListItems]);},[getListItems]);
 
     //SCHEMA 
-    const [currSchema,setCurrSchema] = useState(schema);
-    const [pK,setPK] = useState(schema);
+    const [currSchema,setCurrSchema] = useState(schemas[schema]);
+    const [pK,setPK] = useState(schemas[schema]);
 
     useEffect(()=>{
-        setCurrSchema(schema);
-        const pkEntr = Object.entries(schema).filter((prop)=>(prop[1].primaryKey));
+        setCurrSchema(schemas[schema]);
+        console.log(schemas[schema]);
+        const pkEntr = Object.entries(schemas[schema]).filter((prop)=>(prop[1].primaryKey));
         (pkEntr) && setPK(pkEntr[0][0]);
     },[schema]);
 
@@ -263,7 +265,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                 <AdminDetailsInput
                     key                     = {name}
                     label                   = {label}
-                    schema                  = {schema}
+                    schema                  = {currSchema}
                     reducer                 = {reducer}
                     reducerValue            = {value}
                     reducerProp             = {name}
@@ -289,8 +291,8 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
             datagrid    : () =>(//AdminDatagrid render or DefailsDatagrid?);
                 <AdminDatagrid
                     key                     = {name}   
-                    schema                  ={ referenceSchema }
-                    reducer                 ='references'
+                    schema                  ='articleSchema'
+                    reducer                 ='articles'
                 />
             ),
         }

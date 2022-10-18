@@ -5,10 +5,10 @@ const articleSchema  = {
         gridDisplay: "normal",
         width: 125
     },
-    id_article:{
+    id_ref:{
         type: "number",
-        label: "Suppression",
-        gridDisplay: "delete",
+        label: "Id_ref",
+        gridDisplay: "none",
         width: 125
     },
     number:{
@@ -20,32 +20,20 @@ const articleSchema  = {
     name_ref:{
         type : "string",
         label : "Nom",
-        gridDisplay : "normal",
+        gridDisplay : "none",
         width : 250,
     },
     origin:{
         type : "string",
         label : "Origine",
         gridDisplay : "normal",
-        width : 400,
-    },
-    description:{
-        type : "string",
-        label : "Description",
-        gridDisplay : "normal",
-        width : 400,
+        width : 150,
     },
     main_category:{
         type : "string",
         label : "Catégorie principale",
-        gridDisplay : "normal",
+        gridDisplay : "none",
         width : 400,
-    },
-    valorisation:{
-        type : "number",
-        label : "Valorisation",
-        gridDisplay : "normal",
-        width : 150,
     },
     date_buy:{
         type : "string",
@@ -57,62 +45,14 @@ const articleSchema  = {
         type : "boolean",
         label : "Disponible",
         gridDisplay : "toggle",
-        width : 150,
+        width : 85,
     },
     archived:{
         type : "boolean",
         label : "Archivé",
         gridDisplay : "toggle",
-        width : 150,
-    },
-    delivered:{
-        type : "boolean",
-        label : "Délivré",
-        gridDisplay : "toggle",
-        width : 150,
-    },
-    closed:{
-        type : "boolean",
-        label : "Clôturé",
-        gridDisplay : "toggle",
-        width : 150,
-    },
-    created_at:{
-        type : "string",
-        label : "Date d'enregistrement",
-        gridDisplay : "normal",
-        width : 150,
-    },
-    nb_prolongation:{
-        type: "number",
-        label: "Nombre de prolongation",
-        gridDisplay: "normal",
-        width: 125
-    },
-    id_booking:{
-        type: "number",
-        label: "Id booking",
-        gridDisplay: "normal",
-        width: 125
-    },
-    id_permanency:{
-        type: "number",
-        label: "Id permanence",
-        gridDisplay: "normal",
-        width: 125
-    },
-    id_ref:{
-        type: "number",
-        label: "Id ref",
-        gridDisplay: "normal",
-        width: 125
-    },
-    id_user:{
-        type: "number",
-        label: "Id Adhérent",
-        gridDisplay: "normal",
-        width: 125
-    },
+        width : 85,
+    }
 }
 
 export {articleSchema}

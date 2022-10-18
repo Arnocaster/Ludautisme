@@ -18,11 +18,13 @@ const AdminReferences2 = () => {
     //console.log(getReferences);
     const [buttons,setButtons] = useState([]);
 
-    useEffect(()=>{setButtons([
+    useEffect(()=>{
+        const buttonStruct = [
         [{label : 'ajouter',
           action : {reducer:'references',mode:'new',submitAction:'useAddReferenceMutation'}
         }]
-    ])},[])
+        ]
+        setButtons([...buttonStruct])},[]);
     
     return (
         <div className = 'adminReferences'>
@@ -30,11 +32,11 @@ const AdminReferences2 = () => {
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
-                        schema={referenceSchema}
+                        schema='referenceSchema'
                         reducer='references'
                         />
                 </div>
-                    <AdminDetails   schema={referenceSchema}
+                    <AdminDetails   schema='referenceSchema'
                                     reducer='references'
                                     titleOverride={(details.mode === 'new')
                                                     ?'Nouvelle Référence'

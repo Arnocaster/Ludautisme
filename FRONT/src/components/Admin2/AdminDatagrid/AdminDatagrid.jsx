@@ -1,6 +1,7 @@
 import React, { useState, useEffect,useRef } from 'react';
 import './admindatagrid.scss';
 import store from '../../../store';
+import schemas from '../../../Schemas';
 import details from '../../../store/features/Admin/Details';
 import {actions} from '../../../store/reducers';
 import { ToggleButton, IconButton  } from '@mui/material';
@@ -28,7 +29,6 @@ const AdminDatagrid = ({
     //Utility function
     const capitalize = (string) => string[0].toUpperCase() + string.slice(1).toLowerCase();
 
-
     // RESPONSIVE DATAGRID HEIGHT
     const [height, setHeight] = useState(null);
     const [clientHeight,setClientHeight] = useState(window.innerHeight);
@@ -53,34 +53,60 @@ const AdminDatagrid = ({
     // END RESPONSIVE DATAGRID HEIGHT
 
     //MAIN LOGIC
-    const getState = store.getState()[reducer];
+
+    const [currReducer,setCurrReducer] = useState(reducer);
+    useEffect(()=>{setCurrReducer(reducer)},[reducer]);
+
+    const getState = store.getState()[currReducer];
     
     //FetchData
-    const apiSliceQuery = `useGet${capitalize(reducer)}Query`;
+    const apiSliceQuery = `useGet${capitalize(currReducer)}Query`;
     const apiQuery = apiSlice[apiSliceQuery](); //Mandatory on top-level for useEffect usage
     //console.log(apiQuery);
     //Put data in local reducer
     //store.dispatch(actions[reducer].handleFetch(apiQuery));
+    const [currSchema,setCurrSchema] = useState({});
+    const [columns,setColumns] = useState(['id']);  //Allow datagrid render even without values
+    const [visibleCols,setVisibleCols] = useState(['id']);  //Allow datagrid render even without values
+
+    useEffect(()=>{
+        setCurrSchema({...schemas[schema]});
+    },[schema]);
+
+    useEffect(()=>{
+        const cols = Object.keys(currSchema).map((field) => {
+            return {
+                type : currSchema[field].type,
+                field : field,
+                headerName: currSchema[field].label,
+                width : currSchema[field].width,
+                renderCell : customCellBuilder[currSchema[field].gridDisplay] || ''
+            }
+        });
+        const visColEntries = Object.entries(currSchema).map((entrie)=> [entrie[0], entrie[1].gridDisplay!=='none']);
+        setVisibleCols(Object.fromEntries(visColEntries));
+        setColumns([...cols]);
+    },[currSchema]);
+
+
 
     const [rows,setRows] = useState([]);
 
     useEffect(()=>{console.log(apiQuery)
                     const {status} = apiQuery;
                     console.log(status);
-                    (status === 'fulfilled') &&  store.dispatch(actions[reducer].handleFetch(apiQuery));
-                     (status === 'fulfilled') && setRows(apiQuery.data);              
-    },[apiQuery,reducer]);
-    
-    // useEffect(()=>{(getState.allItems.length > 0) && setRows(getState.allItems)},[getState.allItems]);
-    
-    const [columns] = useState(['id']);  //Allow datagrid render even without values
+                    (status === 'fulfilled') &&  store.dispatch(actions[currReducer].handleFetch(apiQuery));
+                     (status === 'fulfilled') && setRows([...apiQuery.data]);              
+    },[apiQuery,currReducer]);
 
-    const buildInitialState = () =>{
+    const [initialState,setInitialState] = useState({});
+
+    useEffect(()=>{
         const sort = (defaultSortBy) && {sorting : {sortModel : [defaultSortBy],}};                 // defaultSortBy need to be like { field: 'rating', sort: 'desc' } doc here : https://mui.com/x/react-data-grid/sorting/
         const params = [sort];                                                                      // Stack params here
         const buildedInitState = params.reduce((prev,curr)=> (curr) && {...prev,...curr} ,{});      // If current param exist add it to initialState
-        return buildedInitState;
-    }
+        setInitialState({...buildedInitState});
+    },[defaultSortBy])
 
     //Configure custom render cell
     const customCellBuilder = {
@@ -107,7 +133,7 @@ const AdminDatagrid = ({
                 aria-label={`testEdit-${params.row.id}`}
                  onClick={()=>{
                                 const reducerState = {...store.getState()[reducer]}; //{active:{},content:{},status:''};
-                                const foundMainProp = [...Object.entries(schema).find((ent)=> ent[1].primaryKey)];
+                                const foundMainProp = [...Object.entries(currSchema).find((ent)=> ent[1].primaryKey)];
                                 if (foundMainProp.length > 0 ) {
                                     const mainProp = foundMainProp[0];
                                     const item = reducerState.allItems.find((item) => item[mainProp] === params.row[mainProp]);
@@ -126,27 +152,11 @@ const AdminDatagrid = ({
             </IconButton>
                     ),
         array   : (params) => {
-            const valueProp = (schema[params.field].gridArrayProp) && schema[params.field].gridArrayProp;
+            const valueProp = (currSchema[params.field].gridArrayProp) && currSchema[params.field].gridArrayProp;
             const array = (valueProp && params.value[0][valueProp]) && params.value.map((value) => `${value[valueProp]} `);
             return (array) ? array : '';
         }
     }
-
-
-    const columnBuilder = (()=>{
-        return Object.keys(schema).map((field) => {
-            return {
-                type : schema[field].type,
-                field : field,
-                headerName: schema[field].label,
-                width : schema[field].width,
-                renderCell : customCellBuilder[schema[field].gridDisplay] || ''
-            }
-
-        });
-
-    });
-
 
     return (
        <div className="datagrid__availableSpace" 
@@ -158,9 +168,9 @@ const AdminDatagrid = ({
             >
                 <DataGrid
                     rows={rows}
-                    columns={(schema)? columnBuilder() : columns}
-                    // initialState={(initialState)?initialState:{}}
-                    initialState={buildInitialState()}
+                    columns={columns}
+                    columnVisibilityModel={visibleCols}
+                    initialState={initialState}
                     GridColDef="center"
                     localeText={frFR.components.MuiDataGrid.defaultProps.localeText}
                     components={{
