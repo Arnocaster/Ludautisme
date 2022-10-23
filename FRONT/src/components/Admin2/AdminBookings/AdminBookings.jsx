@@ -1,10 +1,10 @@
 import React, { useEffect,useState } from 'react';
-import './adminusers.scss';
+import './adminbooking.scss';
 import AdminDashboardMenu from '../AdminDashboardMenu/AdminDashboardMenu';
 import AdminDataGrid from '../AdminDatagrid/AdminDatagrid';
 import AdminDetails from '../AdminDetails/AdminDetails';
 import {useSelector} from 'react-redux';
-const AdminUsers2 = () => {
+const AdminBookings2 = () => {
 
     //const getReferences = apiSlice.useGetReferencesQuery();              //Mandatory on top-level for useEffect usage
     const { details} = useSelector(state => state); //Redux state
@@ -16,32 +16,39 @@ const AdminUsers2 = () => {
     useEffect(()=>{
         const buttonStruct = [
         [{label : 'ajouter',
-          action : {reducer:'users',mode:'new',submitAction:'useAddUserMutation'}
+          action : {reducer:'bookings',mode:'new',submitAction:'useAddReferenceMutation'}
         }]
         ]
         setButtons([...buttonStruct])},[]);
     
     return (
-        <div className = 'adminusers'>
-            <AdminDashboardMenu title='Utilisateurs' buttons={buttons} reducer='users'/>
+        <div className = 'adminbookings'>
+            <AdminDashboardMenu title='Réservations' buttons={buttons} reducer='references'/>
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
-                        schema='userSchema'
-                        reducer='users'
+                        schema='bookingSchema'
+                        reducer='bookings'
                         level = 'primary'
                         />
                 </div>
-                    <AdminDetails   schema='userSchema'
-                                    reducer='users'
+                    <AdminDetails   schema='bookingsSchema'
+                                    reducer='bookings'
                                     level='primary'
                                     titleOverride={(details.mode === 'new')
-                                                    ?'Nouvel utilisateur'
+                                                    ?'Nouvelle Réservation'
                                                     :null}
                     />
+                    {/* <AdminDetails   schema='articleSchema'
+                                    reducer='articles'
+                                    level='secondary'
+                                    titleOverride={(details.mode === 'new')
+                                                    ?'Nouvelle Réservation'
+                                                    :null}
+                    /> */}
             </div>
         </div>
     )
 }
 
-export default React.memo(AdminUsers2);
+export default React.memo(AdminBookings2);

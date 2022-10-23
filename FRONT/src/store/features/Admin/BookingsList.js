@@ -8,7 +8,7 @@ const initialState = {
 }
 
 export default createSlice({
-  name: 'users',    //!MODIF
+  name: 'bookings',    //!MODIF
   initialState,
   reducers: {
     setStatus: (state, action) => {

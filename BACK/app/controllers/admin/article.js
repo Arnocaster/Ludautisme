@@ -56,7 +56,12 @@ module.exports = {
         const id = [{ id: req.params.id }];
         const article = await articleDataMapper.findFiltered(id);
         if (article.length < 1) {
-            throw new ApiError(404, 'Cet utilisateur n\'existe pas');
+            throw new ApiError(404, 'Cet article n\'existe pas');
+        }
+        const number = [{ number: req.body.number }];
+        const sameNumberArticle = await articleDataMapper.findFiltered(number);
+        if (sameNumberArticle.length > 0 && sameNumberArticle[0].id !== Number(req.params.id)) {
+            throw new ApiError(404, 'Ce numéro est déjà utilisé');
         }
         const updatedUser = await articleDataMapper.update(req.params.id, req.body);
         return res.json(updatedUser);

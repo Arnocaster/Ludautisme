@@ -31,7 +31,7 @@ const AdminDetailsChipContainer = ({reducer,
 
     //LOCAL STATES
     const [list,setList] = useState([]);
-    useEffect(()=>{const {status} = apiList;
+    useEffect(()=>{ const {status} = apiList;
                     (status === 'fulfilled') &&  store.dispatch(actions[reducerList].handleFetch(apiList));
                     (status === 'fulfilled') && setList(apiList.data);}
               ,[apiList,reducerList]

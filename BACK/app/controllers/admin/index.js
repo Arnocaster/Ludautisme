@@ -6,6 +6,7 @@ const referenceController = require('./reference');
 const usersController = require('./users');
 const categorieController = require('./category');
 const tagController = require('./tag');
+const incidentController = require('./incident');
 
 module.exports = {
     articleController,
@@ -16,4 +17,5 @@ module.exports = {
     usersController,
     categorieController,
     tagController,
+    incidentController,
 };

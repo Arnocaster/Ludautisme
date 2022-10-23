@@ -3,11 +3,6 @@ import './adminreference.scss';
 import AdminDashboardMenu from '../AdminDashboardMenu/AdminDashboardMenu';
 import AdminDataGrid from '../AdminDatagrid/AdminDatagrid';
 import AdminDetails from '../AdminDetails/AdminDetails';
-import { referenceSchema } from '../../../Schemas';
-// import users from '../../../store/features/Admin/UsersList';
-import store from '../../../store';
-import {actions} from '../../../store/reducers';
-import { apiSlice } from '../../../store/api/apiSlice.js';
 import {useSelector} from 'react-redux';
 const AdminReferences2 = () => {
 
@@ -34,10 +29,19 @@ const AdminReferences2 = () => {
                     <AdminDataGrid
                         schema='referenceSchema'
                         reducer='references'
+                        level = 'primary'
                         />
                 </div>
                     <AdminDetails   schema='referenceSchema'
                                     reducer='references'
+                                    level='primary'
+                                    titleOverride={(details.mode === 'new')
+                                                    ?'Nouvelle Référence'
+                                                    :null}
+                    />
+                    <AdminDetails   schema='articleSchema'
+                                    reducer='articles'
+                                    level='secondary'
                                     titleOverride={(details.mode === 'new')
                                                     ?'Nouvelle Référence'
                                                     :null}

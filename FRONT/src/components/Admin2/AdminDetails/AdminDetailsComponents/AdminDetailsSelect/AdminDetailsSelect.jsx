@@ -42,9 +42,10 @@ const AdminDetailsSelect = ({
     }
 
     return (
-        <Select label = {label}
-                value = {(value) ? value : ''}
-                onChange={handleChange}
+        <Select label   = {label}
+                value   = {(value) ? value : ''}
+                onChange= {handleChange}
+                size    = 'small'
         >
             {list.map((item,index) => (
                 <MenuItem   

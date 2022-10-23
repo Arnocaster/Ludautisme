@@ -48,6 +48,7 @@ const AdminDetailsInput = ({reducer,
                     id="outlined-size-normal"
                     onChange = {handleChange} 
                     value={(value) ? value : '' } 
+                    size='small'
                     /> 
     )
                             };

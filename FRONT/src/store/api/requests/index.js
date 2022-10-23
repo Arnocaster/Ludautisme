@@ -5,11 +5,12 @@ import { adminReferences } from "./adminReferences";
 import { adminArticles } from "./adminArticles";
 import { adminCategories } from "./adminCategories";
 import { adminTags } from "./adminTags";
+import { adminBookings } from "./adminBookings";
 
 export const initEndpoints = (builder) =>{
 
     //REFERENCEMENT DE NOUVELLES LIBRAIRIES API
-    const endpointsLibs = [adminUsers,adminReferences,adminArticles,adminCategories,adminTags];
+    const endpointsLibs = [adminUsers,adminReferences,adminArticles,adminCategories,adminTags,adminBookings];
     
     //On lit chaque librairie de requete, si stucture ok on le rajoute au endpoints
     //Chaque hook de requete doit être unique

@@ -126,7 +126,19 @@ CREATE TABLE "favorite_user_to_reference"(
     UNIQUE ("id_user","id_ref")
 );
 
-
+CREATE TABLE "incident"(
+    "id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "id_user_declaration" INT REFERENCES "user"("id"),
+    "id_user_resolution" INT REFERENCES "user"("id"),
+    "id_ref" INT REFERENCES "reference"("id"),
+    "id_booking" INT REFERENCES "bookings"("id"),
+    "texte_declaration" TEXT NOT NULL,
+    "date_declaration" TIMESTAMPTZ DEFAULT NOW(),
+    "texte_resolution" TEXT,
+    "date_resolution" TIMESTAMPTZ,
+    "closed" BOOLEAN DEFAULT false,
+    "created_at" TIMESTAMPTZ DEFAULT NOW()
+);
 
 
 

@@ -3,7 +3,8 @@ const bookingSchema  = {
         type: "number",
         label: "Modifier réservation",
         gridDisplay: "edit",
-        width: 125
+        width: 125,
+        primaryKey : true
     },
     delivered:{
         type : "boolean",

@@ -12,8 +12,8 @@
 		transform: translateX(100%);
     }
     &__open{
-        min-width: 400px;
-        max-width: 50%;
+        min-width: 500px;
+        max-width: 75%;
         flex-grow: 2;
         -webkit-transform: none;
 			transform: none;
@@ -90,7 +90,7 @@
         align-items: center;
         flex-wrap: wrap;
         &--title {
-            margin: 1rem 2rem 2rem;
+            margin: 1rem 1rem 1rem;
             font-weight: 800;
             align-self: flex-start;
         }
@@ -99,6 +99,7 @@
             display: flex;
             justify-content: flex-start;
             flex-wrap: wrap;
+            row-gap: 1rem;
         }
     }
 

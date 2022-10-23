@@ -1,9 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-    open:false
-    ,reducer : null
-    ,mode : null
+    primary : {
+            open:false
+            ,reducer : null
+            ,mode : null
+    },
+    secondary : {
+            open:false
+            ,reducer : null
+            ,mode : null
+    }
 }
 
 export default createSlice({
@@ -14,10 +21,13 @@ export default createSlice({
         state.content = action.payload;
     },
     setOpen : (state,action) => {
-        state.open = true;
+        (action.payload === 'primary')
+            ? state.primary.open = true
+            : state.secondary.open = true
     },
     setClose : (state,action) => {
-        state.open = false;
+        state.primary.open = (action.payload === 'primary') ? false : state.primary.open;
+        state.secondary.open = false
     },
     setSubmitPayload:(state,action)  => {
       state.submitAction = action.payload; // mutate the state all you want with immer

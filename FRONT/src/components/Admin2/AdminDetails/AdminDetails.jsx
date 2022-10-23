@@ -15,13 +15,14 @@ import AdminDetailsChipContainer from './AdminDetailsComponents/AdminDetailsChip
 import AdminDetailsInput from './AdminDetailsComponents/AdminDetailsInput/AdminDetailsInput';
 import AdminDetailsTextArea from './AdminDetailsComponents/AdminDetailsTextArea/AdminDetailsTextArea';
 import AdminDetailsSelect from './AdminDetailsComponents/AdminDetailsSelect/AdminDetailsSelect';
+import AdminDetailsCheckbox from './AdminDetailsComponents/AdminDetailsCheckbox/AdminDetailsCheckbox';
 import AdminDatagrid from '../AdminDatagrid/AdminDatagrid';
 //import { referenceSchema } from '../../../Schemas';
 import schemas from '../../../Schemas';
 //import Checkbox from '@mui/material/Checkbox';
 
 
-const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids}) => {
+const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrids,level}) => {
 
     //UTILITY FUNCTIONS
 
@@ -59,22 +60,22 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
 
     const getSubmitActionString = () => {
         const capitalizedReducer = capitalize(reducer);
-        const newItem = (details.mode === 'new') && `useAdd${capitalizedReducer}Mutation`;
-        const removeItem = (!newItem && modeOverride === 'remove') && `useRemove${capitalizedReducer}Mutation`;
-        const updateItem = (!removeItem) && `useUpdate${capitalizedReducer}Mutation`;
-        return (newItem) ? newItem : (removeItem) ? removeItem : updateItem;
+        const newItem       = (details.mode === 'new') && `useAdd${capitalizedReducer}Mutation`;
+        const removeItem    = (!newItem && modeOverride === 'remove') && `useRemove${capitalizedReducer}Mutation`;
+        const updateItem    = (!removeItem) && `useUpdate${capitalizedReducer}Mutation`;
+        return (newItem)    ?   newItem     :   (removeItem)    ? removeItem    :   updateItem;
     }
 
     //REDUX FUNCTIONS 
-    const { details } = useSelector(state => state);
-    const getListItems = store.getState()[reducer].allItems;
+    const { details }   = useSelector(state => state);
+    const getListItems  = store.getState()[reducer].allItems;
     const getActiveItem = store.getState()[reducer].activeItem;
-    const getErrors = store.getState()[reducer].activeErrors;
+    const getErrors     = store.getState()[reducer].activeErrors;
 
     
-    const clearActiveItem = ()=> store.dispatch(actions[reducer].clearActiveItem());
-    const refetchItems = apiSlice[`useGet${capitalize(reducer)}Query`]().refetch;
-    const setClose = ()=> store.dispatch(actions.details.setClose());
+    const clearActiveItem   = ()=> store.dispatch(actions[reducer].clearActiveItem());
+    const refetchItems      = apiSlice[`useGet${capitalize(reducer)}Query`]().refetch;
+    const setClose          = ()=> store.dispatch(actions.details.setClose(level));
 
     //LOCAL STATES
 
@@ -164,7 +165,8 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
     // Use structure to replace with api data
-    const dynaTitle = (currActiveItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
+    console.log(titleStruct && currActiveItem);
+    const dynaTitle = (titleStruct && currActiveItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
                                                                      ? currSchema[elt].titlePrefix                                      //Concat prefix if exist
                                                                      : ''}
                                                                    ${currActiveItem[elt]}`)                                        //Use api data to show title
@@ -189,7 +191,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     
     //DYNAMIC INPUT
     const inputType = (type,label,value,name,apiList,apiListValueProp,apiListLabelProp) => {
-        //(type === 'chipList') && console.log(type,label,value,name);  //Debug only
+        //(type === 'datagrid') && console.log(type,label,value,name);  //Debug only
         const types = {
             select : () => ( 
                 <AdminDetailsSelect
@@ -203,20 +205,17 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                     reducerListLabelProp    = {apiListLabelProp}
 
                 />),
-            checkbox    : () => {
-                                return (<FormControlLabel className='admin-details__input--checkbox admin-details__input '
-                                                name = {name}
-                                                key = {name}
-                                                label={(label) ? label : ''} 
-                                                //onChange = {(event)=>{console.log(event.target)}}
-                                                control={<Checkbox name = {name}
-                                                                   value = '@!ludo_checkbox' 
-                                                                   checked={(value) && value}   //Always send something or mui throw error
-                                                                   //onChange = {handleChange}
-                                                                   inputProps={{ 'aria-label': 'controlled' }}
-                                                                   />
-                                                        } 
-                                />)},
+            checkbox    : () => ( <AdminDetailsCheckbox
+                    key                     = {name}
+                    label                   = {label}
+                    reducer                 = {reducer}
+                    reducerValue            = {value}
+                    reducerProp             = {name}
+                    reducerList             = {apiList}
+                    reducerListValueProp    = {apiListValueProp}
+                    reducerListLabelProp    = {apiListLabelProp}
+
+                />),
             //Special User role case : true = 2 // false = 1 Why: today there are only two roles but db model handle 2+ case.
             //Will Transform to a list when more than 2 case.
             intCheckbox    : () => {
@@ -293,6 +292,11 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                     key                     = {name}   
                     schema                  ='articleSchema'
                     reducer                 ='articles'
+                    filterLinkProp          ='id_ref'
+                    filterOriginReducer     = {reducer}
+                    filterLinkValue         = {currActiveItem['id']}
+                    toolbar                 = {currSchema[name].toolbar}
+                    hideFooter              = {currSchema[name].hideFooter}
                 />
             ),
         }
@@ -303,10 +307,10 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
 
 
     return (
-        <div className={`admin-details ${(details.open)?'admin-details__open':'admin-details__close'}`}>
+        <div className={`admin-details ${(level === 'primary') ? details.primary.open : details.secondary.open}'admin-details__open':'admin-details__close'}`}>
 
             {/* HEADER */}
-            <div className={`admin-details__header  ${(details.open)?'admin-details__header--open':'admin-details__header--close'}`}> 
+            <div className={`admin-details__header  ${((level === 'primary') ? details.primary.open : details.secondary.open)?'admin-details__header--open':'admin-details__header--close'}`}> 
                 <div  className='admin-details__header-button--close admin-details__header-button' onClick={setClose}>
                     <CloseIcon className='admin-details__header-button--close-icon'/>
                 </div>
@@ -315,7 +319,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
             </div>
 
             {/* BLOCS */}
-                <div className={`admin-details__bloc-container ${(details.open)?'admin-details__bloc-container--open':'admin-details__bloc-container--close'}`} >
+                <div className={`admin-details__bloc-container ${((level === 'primary') ? details.primary.open : details.secondary.open)?'admin-details__bloc-container--open':'admin-details__bloc-container--close'}`} >
                     {blocNumb.map((bloc)=>{
                         return(
                             <div className='admin-details__bloc' key={`bloc__${bloc[0]}`}>

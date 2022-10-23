@@ -25,7 +25,15 @@ const AdminDatagrid = ({
     submitAction,
     reducer,
     defaultSortBy,
+    filterLinkProp,
+    filterLinkValue,
+    filterOriginReducer,
+    level,
+    toolbar,
+    hideFooter,
 }) => {
+
+    
     //Utility function
     const capitalize = (string) => string[0].toUpperCase() + string.slice(1).toLowerCase();
 
@@ -92,21 +100,72 @@ const AdminDatagrid = ({
 
     const [rows,setRows] = useState([]);
 
-    useEffect(()=>{console.log(apiQuery)
+    useEffect(()=>{
                     const {status} = apiQuery;
                     console.log(status);
                     (status === 'fulfilled') &&  store.dispatch(actions[currReducer].handleFetch(apiQuery));
-                     (status === 'fulfilled') && setRows([...apiQuery.data]);              
+                    (status === 'fulfilled') && setRows([...apiQuery.data]);              
     },[apiQuery,currReducer]);
 
+    //TOOLBAR
+    const [useToolbar,setUseToolbar] = useState();
+    useEffect(()=> {
+        const toolBarObject = (toolbar === false) 
+                                ?  null
+                                : {Toolbar: GridToolbar,};
+        console.log(toolbar,toolBarObject);
+        setUseToolbar(toolBarObject);
+    },[toolbar]);
+
+    //TOOLBAR
+    const [disableFooter,setDisableFooter] = useState(false);
+    useEffect(()=> {
+        setDisableFooter(hideFooter);
+    },[hideFooter]);
+
+    //SORT ROWS
     const [initialState,setInitialState] = useState({});
+    const [currDefaultSortBy,setCurrDefaultSortBy] = useState();
 
     useEffect(()=>{
-        const sort = (defaultSortBy) && {sorting : {sortModel : [defaultSortBy],}};                 // defaultSortBy need to be like { field: 'rating', sort: 'desc' } doc here : https://mui.com/x/react-data-grid/sorting/
-        const params = [sort];                                                                      // Stack params here
-        const buildedInitState = params.reduce((prev,curr)=> (curr) && {...prev,...curr} ,{});      // If current param exist add it to initialState
+        (defaultSortBy) && setCurrDefaultSortBy({...defaultSortBy});
+    },[defaultSortBy]);
+
+    //FILTER ROWS
+    const [currFilterProp,setCurrFilterProp] = useState();
+    const [currFilterValue,setCurrFilterValue] = useState();
+    const [currfilterOriginReducer,setCurrfilterOriginReducer]  = useState();
+    const [filterModel,setFilterModel] = useState();
+
+    useEffect(()=>{
+        if (filterLinkProp && filterLinkValue && filterOriginReducer) {
+            setCurrFilterProp(filterLinkProp);      //ex. : ref_id
+            setCurrfilterOriginReducer(filterOriginReducer);
+            setCurrFilterValue(filterLinkValue);    //ex. : 'id' from this reducer
+        }
+    },[filterLinkProp,filterLinkValue,filterOriginReducer]);
+
+    const buildFilterObject = () => {
+        const filterObject = {items : [ {columnField:currFilterProp
+                                         ,operatorValue:'='
+                                         ,value:currFilterValue} ] 
+                              }
+        return filterObject
+    }
+    
+
+    useEffect(()=>{
+        (currFilterProp && currFilterValue && currfilterOriginReducer)
+            ? setFilterModel(buildFilterObject())
+            : setFilterModel();
+    },[currFilterProp,currFilterValue,currfilterOriginReducer]);
+
+    useEffect(()=>{
+        const sort = (currDefaultSortBy) && {sorting : {sortModel : [currDefaultSortBy],}};                 // defaultSortBy need to be like { field: 'rating', sort: 'desc' } doc here : https://mui.com/x/react-data-grid/sorting/
+        const params = [sort];// Stack params here
+        const buildedInitState = params.reduce((prev,curr)=> (curr) ? {...prev,...curr} : curr ,{});      // If current param exist add it to initialState
         setInitialState({...buildedInitState});
-    },[defaultSortBy])
+    },[currDefaultSortBy,currFilterProp,currFilterValue,currfilterOriginReducer]);
 
     //Configure custom render cell
     const customCellBuilder = {
@@ -144,7 +203,7 @@ const AdminDatagrid = ({
                                 // store.dispatch(details.actions.setSubmitPayload({actionName:submitAction,params :{param:params.row.id, body:params.row}}));
                                 // store.dispatch(details.actions.setContent(params.row));
                                 store.dispatch(details.actions.setMode(''));
-                                store.dispatch(details.actions.setOpen());
+                                store.dispatch(details.actions.setOpen((level==='primary') && 'primary'));
                               }
                           }
             >
@@ -163,19 +222,19 @@ const AdminDatagrid = ({
             ref={parentSize}
         >
             <div
-                style={{ height: height || 200, width: '100%' }} 
+                style={{ height: height || 200, width: '100%'}} 
                 className="datagrid__container"
             >
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     columnVisibilityModel={visibleCols}
-                    initialState={initialState}
+                    filterModel = {filterModel}
+                    initialState= {initialState}
                     GridColDef="center"
                     localeText={frFR.components.MuiDataGrid.defaultProps.localeText}
-                    components={{
-                        Toolbar: GridToolbar,
-                    }}
+                    components={useToolbar}
+                    hideFooter={true}
                 />
             </div>
         </div>

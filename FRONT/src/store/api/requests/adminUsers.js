@@ -2,7 +2,7 @@
 export const adminUsers = {
     // getUser:'',
     getUsers: { query:() => '/users' },
-    addUser:{type:'POST',query:'/users/'},  //useAddUserMutation
-    updateUser:{type:'PUT',query:'/users/'}, //useUpdateUserMutation
+    addUsers:{type:'POST',query:'/users/'},  //useAddUserMutation
+    updateUsers:{type:'PUT',query:'/users/'}, //useUpdateUserMutation
     // deleteOne:'',
 }

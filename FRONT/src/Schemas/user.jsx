@@ -27,7 +27,8 @@ const userSchema  = {
         label: "Editer profil",
         gridDisplay: "edit",
         width: 100,
-        inputDisplay : 'none'
+        inputDisplay : 'none',
+         primaryKey : true,
     },
     member_number:{
         type : "number",

@@ -1,9 +1,9 @@
 const referenceSchema  = {
     id:{
         type: "number",
-        label: "Modifier référence",
+        label: "Modifier",
         gridDisplay: "edit",
-        width: 200,
+        width: 100,
         inputDisplay:"none",
         primaryKey : true,
     },
@@ -36,7 +36,7 @@ const referenceSchema  = {
     main_category:{
         type : "number",
         label : "Id Catégorie",
-        gridDisplay : "normal",
+        gridDisplay : "none",
         width : 150,
         inputDisplay :  'select',
         apiList :       'categories',
@@ -44,6 +44,13 @@ const referenceSchema  = {
         apiListLabelProp : 'name',
         blocTitle :     'Classification',
         bloc :              2,     
+    },
+    name_category:{
+        type : "string",
+        label : "Nom categorie",
+        gridDisplay : "normal",
+        width : 150,
+        inputDisplay :  'none',     
     },
     tag:{
         type : "number",
@@ -66,10 +73,12 @@ const referenceSchema  = {
         inputDisplay : 'datagrid',
         schema : 'articleSchema',
         reducer : 'articles',
-        apiList : 'referenceSchema',
-        apiListValueProp : 'id',
-        apiListLabelProp : 'name',
-        bloc : 4
+        filterProp : 'id_ref',
+        filterValue :'id',
+        bloc : 4,
+        blocTitle : 'Articles',
+        toolbar : false,
+        hideFooter : true,
     }
 }
 
