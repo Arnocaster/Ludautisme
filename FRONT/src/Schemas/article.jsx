@@ -12,6 +12,7 @@ const articleSchema  = {
         label: "Id_ref",
         gridDisplay: "none",
         inputDisplay:"none",
+        forceApiUsage : true,
         width: 125,
         titlePrefix : 'Article N°',
         title:1

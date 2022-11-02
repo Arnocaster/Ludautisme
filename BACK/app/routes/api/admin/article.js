@@ -22,6 +22,16 @@ const router = express.Router();
 router.route('/:id')
     .get(controllerHandler(articleController.getOne))
     .put(controllerHandler(articleController.updateArticle));
+
+/**
+ * POST api/admin/articles/add
+ * @summary Add one article to reference
+ * @tags [ADMIN] Article
+ * @param {ParamArticleCreate} request.body.required At least number and id_ref
+ * @return {Article} 200 - success response - application/json
+ */
+router.route('/add')
+    .post(controllerHandler(articleController.addArticle));
 /**
  * POST /api/admin/articles/search
  * @summary Get article filtered

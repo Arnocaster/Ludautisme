@@ -35,7 +35,7 @@ const AdminUsers2 = () => {
                     <AdminDetails   schema='userSchema'
                                     reducer='users'
                                     level='primary'
-                                    titleOverride={(details.mode === 'new')
+                                    titleOverride={(details.primary.mode === 'new')
                                                     ?'Nouvel utilisateur'
                                                     :null}
                     />

@@ -4,7 +4,7 @@ import AdminDashboardMenu from '../AdminDashboardMenu/AdminDashboardMenu';
 import AdminDataGrid from '../AdminDatagrid/AdminDatagrid';
 import AdminDetails from '../AdminDetails/AdminDetails';
 import {useSelector} from 'react-redux';
-const AdminBookings2 = () => {
+const AdminBooking2 = () => {
 
     //const getReferences = apiSlice.useGetReferencesQuery();              //Mandatory on top-level for useEffect usage
     const { details} = useSelector(state => state); //Redux state
@@ -16,14 +16,14 @@ const AdminBookings2 = () => {
     useEffect(()=>{
         const buttonStruct = [
         [{label : 'ajouter',
-          action : {reducer:'bookings',mode:'new',submitAction:'useAddReferenceMutation'}
+          action : {reducer:'references',mode:'new',submitAction:'useAddReferenceMutation'}
         }]
         ]
         setButtons([...buttonStruct])},[]);
     
     return (
-        <div className = 'adminbookings'>
-            <AdminDashboardMenu title='Réservations' buttons={buttons} reducer='references'/>
+        <div className = 'adminReferences'>
+            <AdminDashboardMenu title='Références' buttons={buttons} reducer='references'/>
             <div className = 'dashcontainer'>
                 <div className = 'dash-grid'>
                     <AdminDataGrid
@@ -32,18 +32,18 @@ const AdminBookings2 = () => {
                         level = 'primary'
                         />
                 </div>
-                    <AdminDetails   schema='bookingsSchema'
-                                    reducer='bookings'
-                                    level='primary'
-                                    titleOverride={(details.mode === 'new')
+                    <AdminDetails   schema  =   'bookingSchema'
+                                    reducer =   'bookings'
+                                    level   =   'primary'
+                                    titleOverride={(details.primary.mode === 'new')
                                                     ?'Nouvelle Réservation'
                                                     :null}
                     />
-                    {/* <AdminDetails   schema='articleSchema'
-                                    reducer='articles'
-                                    level='secondary'
-                                    titleOverride={(details.mode === 'new')
-                                                    ?'Nouvelle Réservation'
+                    {/* <AdminDetails   schema  =   'articleSchema'
+                                    reducer =   'articles'
+                                    level   =   'secondary'
+                                    titleOverride={(details.secondary.mode === 'new')
+                                                    ?'Nouvel Article'
                                                     :null}
                     /> */}
             </div>
@@ -51,4 +51,4 @@ const AdminBookings2 = () => {
     )
 }
 
-export default React.memo(AdminBookings2);
+export default React.memo(AdminBooking2);

@@ -47,7 +47,7 @@ const AdminDetailsCheckbox = ({reducer,
                             onChange = {handleChange}
                             control = {<Checkbox
                                         value = '@!ludo_checkbox' 
-                                        checked={(value) && value}   //Always send something or mui throw error
+                                        checked={(value) ? value : false}   //Always send something or mui throw error
                                         //onChange = {handleChange}
                                         inputProps={{ 'aria-label': 'controlled' }}
                                     />}

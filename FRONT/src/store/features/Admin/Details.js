@@ -21,22 +21,23 @@ export default createSlice({
         state.content = action.payload;
     },
     setOpen : (state,action) => {
-        (action.payload === 'primary')
-            ? state.primary.open = true
-            : state.secondary.open = true
+        state.primary.open = true;
+        state.secondary.open = (action.payload !== 'primary');
     },
     setClose : (state,action) => {
-        state.primary.open = (action.payload === 'primary') ? false : state.primary.open;
-        state.secondary.open = false
+        state[action.payload].open = false;
+        if (action.payload === 'primary') {state.secondary.open = false;}; 
     },
     setSubmitPayload:(state,action)  => {
       state.submitAction = action.payload; // mutate the state all you want with immer
     },
     setReducer:(state,action) => {
-        state.reducer = action.payload.charAt(0).toUpperCase() + action.payload.slice(1); //Capitalise for redux apiSlice automatic function naming 
+        const {reducer,level} = action.payload;
+        state[level].reducer = reducer.charAt(0).toUpperCase() + reducer.slice(1); //Capitalise for redux apiSlice automatic function naming 
     },
     setMode:(state,action) => {
-        state.mode = action.payload;
+        const {mode,level} = action.payload;
+        state[level].mode = mode;
     }
   },
 });

@@ -5,7 +5,7 @@ const router = require('./routes');
 
 const app = express();
 
-// END Serve React app
+// JSDOC
 if (process.env.NODE_ENV !== 'production') {
     require('./helpers/apiDoc')(app);
 }

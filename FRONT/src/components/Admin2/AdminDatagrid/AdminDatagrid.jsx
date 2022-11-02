@@ -81,6 +81,21 @@ const AdminDatagrid = ({
         setCurrSchema({...schemas[schema]});
     },[schema]);
 
+    const quantityOnlyOperators = [
+    {
+            label: 'includes',
+            value: 'includes',
+            getApplyFilterFn: (filterItem) => {
+            const arrValue = (!Array.isArray(filterItem.value))?[filterItem.value]:filterItem.value;
+            return ({ value }) => {
+                    (arrValue.includes(value)) && console.log(arrValue,value);
+                    return (arrValue.includes(value));
+                };
+            },
+            //InputComponent: InputNumberInterval,
+        },
+    ];
+
     useEffect(()=>{
         const cols = Object.keys(currSchema).map((field) => {
             return {
@@ -88,7 +103,8 @@ const AdminDatagrid = ({
                 field : field,
                 headerName: currSchema[field].label,
                 width : currSchema[field].width,
-                renderCell : customCellBuilder[currSchema[field].gridDisplay] || ''
+                renderCell : customCellBuilder[currSchema[field].gridDisplay] || '',
+                filterOperators: (filterLinkProp === field) && quantityOnlyOperators,
             }
         });
         const visColEntries = Object.entries(currSchema).map((entrie)=> [entrie[0], entrie[1].gridDisplay!=='none']);
@@ -102,7 +118,6 @@ const AdminDatagrid = ({
 
     useEffect(()=>{
                     const {status} = apiQuery;
-                    console.log(status);
                     (status === 'fulfilled') &&  store.dispatch(actions[currReducer].handleFetch(apiQuery));
                     (status === 'fulfilled') && setRows([...apiQuery.data]);              
     },[apiQuery,currReducer]);
@@ -113,7 +128,6 @@ const AdminDatagrid = ({
         const toolBarObject = (toolbar === false) 
                                 ?  null
                                 : {Toolbar: GridToolbar,};
-        console.log(toolbar,toolBarObject);
         setUseToolbar(toolBarObject);
     },[toolbar]);
 
@@ -139,15 +153,15 @@ const AdminDatagrid = ({
 
     useEffect(()=>{
         if (filterLinkProp && filterLinkValue && filterOriginReducer) {
-            setCurrFilterProp(filterLinkProp);      //ex. : ref_id
-            setCurrfilterOriginReducer(filterOriginReducer);
-            setCurrFilterValue(filterLinkValue);    //ex. : 'id' from this reducer
+            (currFilterProp !== filterLinkProp) && setCurrFilterProp(filterLinkProp);      //ex. : ref_id
+            (currfilterOriginReducer !== filterOriginReducer) &&setCurrfilterOriginReducer(filterOriginReducer);
+            (currFilterValue !== filterLinkValue) && setCurrFilterValue(filterLinkValue);    //ex. : 'id' from this reducer
         }
     },[filterLinkProp,filterLinkValue,filterOriginReducer]);
 
     const buildFilterObject = () => {
         const filterObject = {items : [ {columnField:currFilterProp
-                                         ,operatorValue:'='
+                                         ,operatorValue:'includes'
                                          ,value:currFilterValue} ] 
                               }
         return filterObject
@@ -163,8 +177,9 @@ const AdminDatagrid = ({
     useEffect(()=>{
         const sort = (currDefaultSortBy) && {sorting : {sortModel : [currDefaultSortBy],}};                 // defaultSortBy need to be like { field: 'rating', sort: 'desc' } doc here : https://mui.com/x/react-data-grid/sorting/
         const params = [sort];// Stack params here
-        const buildedInitState = params.reduce((prev,curr)=> (curr) ? {...prev,...curr} : curr ,{});      // If current param exist add it to initialState
-        setInitialState({...buildedInitState});
+        const buildedInitState = params.reduce((prev,curr)=> (curr) ? {...prev,...curr} : curr ,{});
+        console.log(buildedInitState,initialState);      // If current param exist add it to initialState
+        (buildedInitState) && setInitialState({...buildedInitState});
     },[currDefaultSortBy,currFilterProp,currFilterValue,currfilterOriginReducer]);
 
     //Configure custom render cell
@@ -193,17 +208,21 @@ const AdminDatagrid = ({
                  onClick={()=>{
                                 const reducerState = {...store.getState()[reducer]}; //{active:{},content:{},status:''};
                                 const foundMainProp = [...Object.entries(currSchema).find((ent)=> ent[1].primaryKey)];
+                                //  Object.keys(store.getState()).forEach(
+                                //     (reducer)=> (store.getState()[reducer].activeItem) 
+                                //                     && store.dispatch(actions[reducer].setActiveItem({}))
+                                //                     );
                                 if (foundMainProp.length > 0 ) {
                                     const mainProp = foundMainProp[0];
                                     const item = reducerState.allItems.find((item) => item[mainProp] === params.row[mainProp]);
                                     !(!item) && store.dispatch(actions[reducer].setActiveItem(item));
                                 }
                                 //store.dispatch()
-                                store.dispatch(details.actions.setReducer(reducer));
+                                store.dispatch(details.actions.setReducer({level,reducer}));
                                 // store.dispatch(details.actions.setSubmitPayload({actionName:submitAction,params :{param:params.row.id, body:params.row}}));
                                 // store.dispatch(details.actions.setContent(params.row));
-                                store.dispatch(details.actions.setMode(''));
-                                store.dispatch(details.actions.setOpen((level==='primary') && 'primary'));
+                                store.dispatch(details.actions.setMode({mode:'',level}));
+                                store.dispatch(details.actions.setOpen(level));
                               }
                           }
             >
@@ -230,7 +249,7 @@ const AdminDatagrid = ({
                     columns={columns}
                     columnVisibilityModel={visibleCols}
                     filterModel = {filterModel}
-                    initialState= {initialState}
+                    //initialState= {initialState}
                     GridColDef="center"
                     localeText={frFR.components.MuiDataGrid.defaultProps.localeText}
                     components={useToolbar}

@@ -39,10 +39,14 @@ module.exports = {
         return res.json(articles);
     },
     async addArticle(req, res) {
+        console.log(req.body);
         // je vérifie si la référence existe
         const reference = await referenceDataMapper.findOne(req.body.id_ref);
         if (reference.length < 1) {
             throw new ApiError(404, 'La référence parent n\'existe pas');
+        }
+        if (!req.body.number) {
+            throw new ApiError(400, 'Aucun numéro d\'article n\'a été fourni');
         }
         const article = await articleDataMapper.findByCode(req.body.number);
         if (article.length > 0) {

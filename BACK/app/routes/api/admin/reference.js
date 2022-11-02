@@ -15,7 +15,7 @@ const router = express.Router();
 router.route('/article')
     .post(controllerHandler(articleController.addArticle));
 /**
- * GET api/admin/references/actives
+ * GET api/admin/references/article
  * @summary Get all active references for admin
  * @tags [ADMIN] Reference
  * @return {[Reference]} 200 - success response - application/json

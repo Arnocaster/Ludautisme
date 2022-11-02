@@ -10,10 +10,10 @@ const AdminDashboardMenu = ({title, buttons,reducer}) => {
     const { details, users } = useSelector(state => state); //Redux state 
 
     const handleNewElement = (params) => {
-        store.dispatch(actions.details.setMode('new'));
+        store.dispatch(actions.details.setMode({mode:'new',level:'primary'}));
         store.dispatch(actions[reducer].clearActiveItem());
         store.dispatch(actions[reducer].setActiveItem({}));
-        store.dispatch(actions.details.setOpen());
+        store.dispatch(actions.details.setOpen('primary'));
     }
 
     const [btns,setBtns] = useState(buttons);

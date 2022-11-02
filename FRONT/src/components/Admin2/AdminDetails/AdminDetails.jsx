@@ -17,6 +17,7 @@ import AdminDetailsTextArea from './AdminDetailsComponents/AdminDetailsTextArea/
 import AdminDetailsSelect from './AdminDetailsComponents/AdminDetailsSelect/AdminDetailsSelect';
 import AdminDetailsCheckbox from './AdminDetailsComponents/AdminDetailsCheckbox/AdminDetailsCheckbox';
 import AdminDatagrid from '../AdminDatagrid/AdminDatagrid';
+import AdminButtonAdd from '../AdminReusableComponents/AdminButtonAdd/AdminButtonAdd';
 //import { referenceSchema } from '../../../Schemas';
 import schemas from '../../../Schemas';
 //import Checkbox from '@mui/material/Checkbox';
@@ -60,7 +61,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
 
     const getSubmitActionString = () => {
         const capitalizedReducer = capitalize(reducer);
-        const newItem       = (details.mode === 'new') && `useAdd${capitalizedReducer}Mutation`;
+        const newItem       = (details[level].mode === 'new') && `useAdd${capitalizedReducer}Mutation`;
         const removeItem    = (!newItem && modeOverride === 'remove') && `useRemove${capitalizedReducer}Mutation`;
         const updateItem    = (!removeItem) && `useUpdate${capitalizedReducer}Mutation`;
         return (newItem)    ?   newItem     :   (removeItem)    ? removeItem    :   updateItem;
@@ -103,7 +104,6 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
 
     useEffect(()=>{
         setCurrSchema(schemas[schema]);
-        console.log(schemas[schema]);
         const pkEntr = Object.entries(schemas[schema]).filter((prop)=>(prop[1].primaryKey));
         (pkEntr) && setPK(pkEntr[0][0]);
     },[schema]);
@@ -127,15 +127,15 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
     }
     const handleSubmit = () => {
         const routeParam = (details.mode !== 'new') && getActiveItem[pK];
-        console.log(currActiveItem);
         const cleanedPayloadData = Object.entries(getActiveItem)
                                   .filter((entrie)=>{
-                                    const isDisplayed = (currSchema[entrie[0]]) &&  (currSchema[entrie[0]].inputDisplay !== 'none'); 
+                                    const isDisplayed = (currSchema[entrie[0]]) &&  ((currSchema[entrie[0]].inputDisplay !== 'none') || currSchema[entrie[0]].forceApiUsage); 
+                                    console.log(entrie,(currSchema[entrie[0]]) , (currSchema[entrie[0]].inputDisplay !== 'none'))
                                     return entrie[0] !== pK && isDisplayed;
                                     });
         const payloadData = Object.fromEntries(cleanedPayloadData);
         const fullPayload = (routeParam) ? {body:payloadData,param:routeParam} : {body:payloadData};
-        console.log(fullPayload);
+        //console.log(getActiveItem,cleanedPayloadData,payloadData,fullPayload);
         (submitable) && submit(fullPayload).unwrap()
                                             .then((payload) => {setAlert({severity:'success',message:'Succès'});
                                                                 setTimeout(()=>{setAlert();
@@ -165,7 +165,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                         .map(titleElt => titleElt[0]);                                                              //get props ordered Result : Ex. : [title1,title2]
     
     // Use structure to replace with api data
-    console.log(titleStruct && currActiveItem);
+    //console.log(titleStruct && currActiveItem);
     const dynaTitle = (titleStruct && currActiveItem) ? titleStruct.map(elt => `${(currSchema[elt].titlePrefix)                                       //For each key filled in sche : Concat string type titlePrefix + TitleContent
                                                                      ? currSchema[elt].titlePrefix                                      //Concat prefix if exist
                                                                      : ''}
@@ -175,7 +175,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
 
     //DYNAMIC FIELDS
     const blocNumb = (currSchema) && [...new Set(Object.entries(currSchema)                                                                 //...new Set naturaly avoid duplicate values
-                                         .map((elt)=> [elt[1].bloc,elt[1].blocTitle,elt[1].field])                                  //ex. : [indexBloc,titleBloc,fieldInput]
+                                         .map((elt)=> [elt[1].bloc,elt[1].blocTitle,elt[1].field,elt[1].blocAddButton,elt[1].reducer,elt[1].linkedProp])                             //ex. : [indexBloc,titleBloc,fieldInput]
                                          .reduce((prev,curr)=>{
                                             const iExist = prev.findIndex((elt)=> elt[0] === curr[0]);                              //Check if another bloc is similar
                                             const updateBloc = (iExist >= 0) && ((                                                  //If there is another bloc
@@ -187,8 +187,7 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                                         },[])   //get bloc number
                                          .sort((a,b)=> {return (!a[0] || !b[0]) ? -1 : a[0] - b[0]})                                //order by bloc number from small to big AND undefined at the end
                                     )];                                                                                             //Result [[1(blocnum),'title1',1(field)],2,3,etc...,[undefined,undefined,undefined]
-    //console.log(blocNumb);
-    
+    // console.log(blocNumb);
     //DYNAMIC INPUT
     const inputType = (type,label,value,name,apiList,apiListValueProp,apiListLabelProp) => {
         //(type === 'datagrid') && console.log(type,label,value,name);  //Debug only
@@ -287,18 +286,24 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
             imageGallery : () => {//AdminImageGallery render );
                                 console.log('ImageGallery render test');
             },
-            datagrid    : () =>(//AdminDatagrid render or DefailsDatagrid?);
+            datagrid    : () =>{//AdminDatagrid render or DefailsDatagrid?);
+                console.log(currSchema[name].filterProp,name);
+                (Array.isArray(currActiveItem[name])) 
+                    ? console.log(currActiveItem[name].map((item)=>item[currSchema[name].filterProp]))
+                    :  console.log(currActiveItem[name]);
+                return(
                 <AdminDatagrid
                     key                     = {name}   
-                    schema                  ='articleSchema'
-                    reducer                 ='articles'
-                    filterLinkProp          ='id_ref'
-                    filterOriginReducer     = {reducer}
-                    filterLinkValue         = {currActiveItem['id']}
+                    schema                  = {currSchema[name].schema}
+                    level                   = 'secondary'
+                    reducer                 = {currSchema[name].reducer}
+                    filterLinkProp          = {currSchema[name].filterProp}
+                    filterOriginReducer     = {currSchema[name].filterOriginReducer}
+                    filterLinkValue         = {currActiveItem[currSchema[name].filterValue]}
                     toolbar                 = {currSchema[name].toolbar}
                     hideFooter              = {currSchema[name].hideFooter}
-                />
-            ),
+                />)
+            },
         }
 
         return (types[type]) ? types[type]() : types.input()
@@ -324,7 +329,17 @@ const AdminDetails = ({schema,reducer,titleOverride,modeOverride,detailsDatagrid
                         return(
                             <div className='admin-details__bloc' key={`bloc__${bloc[0]}`}>
 
-                                <div className='admin-details__bloc--title'> {bloc[1]}</div>
+                                <div className='admin-details__bloc--title'> 
+                                    <span>{bloc[1]}</span>
+                                    {(bloc[3]) && 
+                                        <AdminButtonAdd type  ='icon'
+                                                        level = 'secondary'
+                                                        reducer = {bloc[4]}
+                                                        linkedProp = {{[bloc[5]]:currActiveItem[pK]}}/>
+                                    }
+                                    
+                                </div>
+
 
                                 <div className='admin-details__bloc--inputs'>
 

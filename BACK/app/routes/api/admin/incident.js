@@ -48,6 +48,7 @@ router.route('/:id')
  * @param {paramIndident}
  * @return {Confirm} 200 - success response - applcation/json
  */
+
 router.route('/')
     .get(controllerHandler(incidentController.getAll))
     .post(controllerHandler(incidentController.addOne));

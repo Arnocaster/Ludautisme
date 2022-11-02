@@ -32,18 +32,18 @@ const AdminReferences2 = () => {
                         level = 'primary'
                         />
                 </div>
-                    <AdminDetails   schema='referenceSchema'
-                                    reducer='references'
-                                    level='primary'
-                                    titleOverride={(details.mode === 'new')
+                    <AdminDetails   schema  =   'referenceSchema'
+                                    reducer =   'references'
+                                    level   =   'primary'
+                                    titleOverride={(details.primary.mode === 'new')
                                                     ?'Nouvelle Référence'
                                                     :null}
                     />
-                    <AdminDetails   schema='articleSchema'
-                                    reducer='articles'
-                                    level='secondary'
-                                    titleOverride={(details.mode === 'new')
-                                                    ?'Nouvelle Référence'
+                    <AdminDetails   schema  =   'articleSchema'
+                                    reducer =   'articles'
+                                    level   =   'secondary'
+                                    titleOverride={(details.secondary.mode === 'new')
+                                                    ?'Nouvel Article'
                                                     :null}
                     />
             </div>
